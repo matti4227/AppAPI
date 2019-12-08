@@ -4,8 +4,6 @@ import com.zaxxer.hikari.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import javax.sql.DataSource;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 @Configuration
 public class DatabaseConfig {
@@ -14,8 +12,7 @@ public class DatabaseConfig {
     private String dbUrl;
 
     @Bean
-    public DataSource dataSource() throws SQLException {
-//        DriverManager.getDriver("org.postgresql.Driver");
+    public DataSource dataSource() {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(dbUrl);
         return new HikariDataSource(config);
