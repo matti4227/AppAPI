@@ -3,7 +3,7 @@ package com.application.app.recipe;
 import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.cookbook.Cookbook;
 import com.application.app.ingredient.Ingredient;
-import com.application.app.recipeCategory.RecipeCategory;
+//import com.application.app.recipeCategory.RecipeCategory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
