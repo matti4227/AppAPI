@@ -1,0 +1,59 @@
+package com.application.app.applicationUser;
+
+import com.application.app.cookbook.Cookbook;
+import com.application.app.fridge.Fridge;
+import com.application.app.recipe.Recipe;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "users")
+public class ApplicationUser {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Size(max = 50)
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Size(max = 50)
+    @Column(name = "last_name")
+    private String lastName;
+
+    @NotBlank
+    @Email
+    @Size(max = 100)
+    private String email;
+
+    @NotBlank
+    @Size(min = 3, max = 24)
+    private String username;
+
+    @NotBlank
+//    @Size(min = 6, max = 24)
+    private String password;
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Recipe> recipes = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    private Cookbook cookbook;
+
+    @JsonManagedReference
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    private Fridge fridge;
+}
