@@ -15,6 +15,8 @@ public class DatabaseConfig {
     public DataSource dataSource() {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(dbUrl);
+        config.setUsername("pznjkznqhavwpm");
+        config.setPassword("78ec9e9a5f16248351c0372dc0414c3d87abb204d1f1b1d3cf9813a59341adbc");
         return new HikariDataSource(config);
     }
 }
