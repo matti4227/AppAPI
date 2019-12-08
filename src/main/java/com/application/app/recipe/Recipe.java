@@ -67,9 +67,9 @@ public class Recipe {
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", fetch = FetchType.LAZY)
 //    private List<RecipePicture> recipePictures = new ArrayList<>();
 
-    @JsonManagedReference
-    @ManyToMany(mappedBy = "recipes", fetch = FetchType.LAZY)
-    private List<RecipeCategory> recipeCategories = new ArrayList<>();
+//    @JsonManagedReference
+//    @ManyToMany(mappedBy = "recipes", fetch = FetchType.LAZY)
+//    private List<RecipeCategory> recipeCategories = new ArrayList<>();
 
     @JsonManagedReference
     @ManyToMany(mappedBy = "recipes", fetch = FetchType.LAZY)
