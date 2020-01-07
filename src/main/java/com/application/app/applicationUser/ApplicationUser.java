@@ -38,12 +38,16 @@ public class ApplicationUser {
     private String email;
 
     @NotBlank
+    @Column(unique = true)
     @Size(min = 3, max = 24)
     private String username;
 
     @NotBlank
 //    @Size(min = 6, max = 24)
     private String password;
+
+    @Lob
+    private byte[] avatar;
 
     @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)

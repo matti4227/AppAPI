@@ -31,6 +31,24 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
     @Override
     public ApplicationUser getUser(Long id) {
         return userRepositoryInterface.findById(id).orElse(null);
+    }
+
+    @Override
+    public ApplicationUserResponse getResponseUser(ApplicationUser user) throws Exception {
+        if (user != null) {
+            return new ApplicationUserResponse(
+                    user.getEmail(),
+                    user.getUsername(),
+                    user.getFirstName(),
+                    user.getLastName());
+        } else {
+            throw new Exception();
+        }
+    }
+
+    @Override
+    public ApplicationUser getUserByName(String username) {
+        return userRepositoryInterface.findByUsername(username);
         //być może stworzyć domyślną wartość
     }
 
@@ -41,8 +59,14 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
     }
 
     @Override
-    public ApplicationUser updateUser(ApplicationUserRequest userRequest, Long id) {
-        ApplicationUser originalUser = getUser(id);
+    public ApplicationUser updateUser(ApplicationUserRequest userRequest) {
+        ApplicationUser originalUser = getUserByName(userRequest.getUsername());
         return userRepository.updateUser(originalUser, userRequest);
+    }
+
+    @Override
+    public ApplicationUser updateUserAvatar(Long id, byte[] avatar) {
+        ApplicationUser originalUser = getUser(id);
+        return userRepository.updateUserAvatar(originalUser, avatar);
     }
 }

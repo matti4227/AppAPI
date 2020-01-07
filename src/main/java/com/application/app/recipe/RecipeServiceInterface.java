@@ -1,6 +1,9 @@
 package com.application.app.recipe;
 
 import com.application.app.ingredient.Ingredient;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +15,11 @@ public interface RecipeServiceInterface {
 
     Recipe getRecipe(Long id);
 
-    List<Recipe> getRecipes();
+//    RecipePageResponse getRecipes(int page);
+
+    RecipePageResponse getRecipesByParameters(int difficulty, int preparationTime, int sort, int page);
+
+    RecipePageResponse getRecipesByNameSearch(String name, int page);
 
     Recipe updateRecipe(Long id, RecipeRequest recipeRequest);
 

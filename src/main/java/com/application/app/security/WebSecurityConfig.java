@@ -56,7 +56,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(AUTHENTICATE_URL).permitAll()
                 .antMatchers(SIGN_UP_URL).permitAll()
                 .antMatchers("/recipes").permitAll()
-                .antMatchers("/recipes/create").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)

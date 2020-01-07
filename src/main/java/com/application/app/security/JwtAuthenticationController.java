@@ -1,5 +1,6 @@
 package com.application.app.security;
 
+import com.application.app.applicationUser.ApplicationUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,9 @@ public class JwtAuthenticationController {
     @Autowired
     private JwtUserDetailsService userDetailsService;
 
+    @Autowired
+    private ApplicationUserService applicationUserService;
+
     @PostMapping(value = "")
     public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
@@ -33,7 +37,8 @@ public class JwtAuthenticationController {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDetails);
 
-        JwtResponse response = new JwtResponse(userDetails.getUsername(), token);
+        Long id = applicationUserService.getUserByName(userDetails.getUsername()).getId();
+        JwtResponse response = new JwtResponse(id, userDetails.getUsername(), token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

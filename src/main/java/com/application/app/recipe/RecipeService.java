@@ -4,7 +4,15 @@ import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.applicationUser.ApplicationUserService;
 import com.application.app.ingredient.Ingredient;
 import com.application.app.ingredient.IngredientService;
+import com.application.app.recipe.specifications.RecipeWithDifficulty;
+import com.application.app.recipe.specifications.RecipeWithNameSearch;
+import com.application.app.recipe.specifications.RecipeWithPreparationTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,9 +52,41 @@ public class RecipeService implements RecipeServiceInterface {
         return recipeRepositoryInterface.findById(id).orElse(null);
     }
 
+//    @Override
+//    public RecipePageResponse getRecipes(int page) {
+//        Page<Recipe> recipePage = recipeRepositoryInterface.findAll(PageRequest.of(page, 3));
+//        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages());
+//    }
+
     @Override
-    public List<Recipe> getRecipes() {
-        return recipeRepositoryInterface.findAll();
+    public RecipePageResponse getRecipesByParameters(int difficulty, int preparationTime, int sort, int page) {
+        Specification<Recipe> spec = Specification
+                .where(new RecipeWithDifficulty(difficulty))
+                .and(new RecipeWithPreparationTime(preparationTime));
+
+        Pageable pageRequest;
+
+        if (sort == 1) {
+            Sort s = Sort.by("createdDate").ascending();
+            pageRequest = PageRequest.of(page, 3, s);
+        } else if (sort == 2) {
+            Sort s = Sort.by("createdDate").descending();
+            pageRequest = PageRequest.of(page, 3, s);
+        } else {
+            pageRequest = PageRequest.of(page, 3);
+        }
+
+        Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, pageRequest);
+
+        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages());
+    }
+
+    @Override
+    public RecipePageResponse getRecipesByNameSearch(String name, int page) {
+        Specification<Recipe> spec = Specification.where(new RecipeWithNameSearch(name));
+
+        Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, PageRequest.of(page, 3));
+        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages());
     }
 
     @Override

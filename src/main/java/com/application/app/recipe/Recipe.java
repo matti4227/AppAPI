@@ -3,14 +3,15 @@ package com.application.app.recipe;
 import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.cookbook.Cookbook;
 import com.application.app.ingredient.Ingredient;
-//import com.application.app.recipeCategory.RecipeCategory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class Recipe {
     private String description;
 
     @NotBlank
-    @Size(max = 50000)
+    @Size(max = 10000)
     private String preparation;
 
     @Min(1)
@@ -45,6 +46,10 @@ public class Recipe {
     private int difficulty;
 
     private float rating;
+
+    @Column(updatable = false)
+    @CreationTimestamp
+    private Timestamp createdDate;
 
     @Lob
     private byte[] picture;

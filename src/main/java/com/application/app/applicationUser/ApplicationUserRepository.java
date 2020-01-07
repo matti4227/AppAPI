@@ -51,4 +51,19 @@ public class ApplicationUserRepository {
 
         return originalUser;
     }
+
+    public ApplicationUser updateUserAvatar(ApplicationUser originalUser, byte[] avatar) {
+
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+
+        if (avatar != null) {
+            originalUser.setAvatar(avatar);
+        }
+
+        entityManager.merge(originalUser);
+        entityManager.getTransaction().commit();
+
+        return originalUser;
+    }
 }

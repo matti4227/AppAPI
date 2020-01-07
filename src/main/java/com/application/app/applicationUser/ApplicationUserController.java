@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -38,9 +39,10 @@ public class ApplicationUserController {
     }
 
     @GetMapping(value = "/users/{id}")
-    public ResponseEntity<ApplicationUser> getUser(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<ApplicationUserResponse> getUser(@PathVariable(value = "id") Long id) {
         try {
-            ApplicationUser response = userService.getUser(id);
+            ApplicationUser user = userService.getUser(id);
+            ApplicationUserResponse response = userService.getResponseUser(user);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -58,11 +60,21 @@ public class ApplicationUserController {
         }
     }
 
-    @PatchMapping(value = "/users/edit/{id}")
-    public ResponseEntity<ApplicationUser> updateUser(@RequestBody ApplicationUserRequest userRequest,
-                                                      @PathVariable(value = "id") Long id) {
+    @PatchMapping(value = "/users/{id}/edit")
+    public ResponseEntity<ApplicationUser> updateUser(@RequestBody ApplicationUserRequest userRequest) {
         try {
-            ApplicationUser response = userService.updateUser(userRequest, id);
+            ApplicationUser response = userService.updateUser(userRequest);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception er) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PatchMapping(value = "/users/{id}/avatar")
+    public ResponseEntity<ApplicationUser> updateUserAvatar(@RequestParam(value = "file") MultipartFile file,
+                                                            @PathVariable(value = "id") Long id) {
+        try {
+            ApplicationUser response = userService.updateUserAvatar(id, file.getBytes());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

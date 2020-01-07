@@ -8,7 +8,13 @@ public interface ApplicationUserServiceInterface {
 
     ApplicationUser getUser(Long id);
 
+    ApplicationUserResponse getResponseUser(ApplicationUser user) throws Exception;
+
+    ApplicationUser getUserByName(String username);
+
     List<ApplicationUser> getUsers();
 
-    ApplicationUser updateUser(ApplicationUserRequest userRequest, Long id);
+    ApplicationUser updateUser(ApplicationUserRequest userRequest);
+
+    ApplicationUser updateUserAvatar(Long id, byte[] avatar);
 }
