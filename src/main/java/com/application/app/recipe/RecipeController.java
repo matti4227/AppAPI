@@ -2,6 +2,7 @@ package com.application.app.recipe;
 
 import com.application.app.cookbook.CookbookService;
 import com.application.app.ingredient.IngredientRequest;
+import com.application.app.recipe.comment.RecipeCommentRequest;
 import com.application.app.recipe.vote.RecipeVoteRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,9 +17,6 @@ public class RecipeController {
 
     @Autowired
     private RecipeService recipeService;
-
-    @Autowired
-    private CookbookService cookbookService;
 
     @PostMapping(value = "/create")
     public ResponseEntity<Recipe> createRecipe(@RequestBody RecipeRequest recipeRequest) {
@@ -124,7 +122,7 @@ public class RecipeController {
     public ResponseEntity<Object> addToCookbook(@PathVariable(value = "id") Long recipeId,
                                                 @RequestBody RecipeCookbookRequest recipeCookbookRequest) {
         try {
-            cookbookService.addRecipe(recipeId, recipeCookbookRequest.getId());
+            recipeService.addRecipeToCookbook(recipeId, recipeCookbookRequest.getId());
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -136,6 +134,17 @@ public class RecipeController {
                                              @RequestBody RecipeVoteRequest recipeVoteRequest) {
         try {
             recipeService.addScoreToRecipe(recipeId, recipeVoteRequest);
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (Exception er) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<Object> commentRecipe(@PathVariable(value = "id") Long recipeId,
+                                                @RequestBody RecipeCommentRequest recipeCommentRequest) {
+        try {
+            recipeService.addCommentToRecipe(recipeId, recipeCommentRequest);
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

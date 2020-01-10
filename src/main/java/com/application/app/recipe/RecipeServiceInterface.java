@@ -2,6 +2,7 @@ package com.application.app.recipe;
 
 import com.application.app.ingredient.Ingredient;
 import com.application.app.ingredient.IngredientRequest;
+import com.application.app.recipe.comment.RecipeCommentRequest;
 import com.application.app.recipe.vote.RecipeVoteRequest;
 import com.application.app.recipe.vote.Vote;
 import com.application.app.recipeCategory.RecipeCategory;
@@ -32,6 +33,8 @@ public interface RecipeServiceInterface {
 
     void deleteRecipe(Long id);
 
+    void addRecipeToCookbook(Long recipeId, Long id);
+
     void addRecipeToCategories(Recipe recipe, List<RecipeCategory> categories);
 
     void removeRecipeFromCategories(Recipe recipe);
@@ -49,6 +52,9 @@ public interface RecipeServiceInterface {
     void updateRating(Recipe recipe, List<Vote> votes);
 
     Boolean userAlreadyVoted(Long userId, List<Vote> votes);
+
+    void addCommentToRecipe(Long recipeId, RecipeCommentRequest recipeCommentRequest);
+
 
 //    Ingredient getIngredientFromRecipe(Long recipeId, String ingredientName);
 }

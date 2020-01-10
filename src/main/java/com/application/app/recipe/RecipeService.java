@@ -2,9 +2,12 @@ package com.application.app.recipe;
 
 import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.applicationUser.ApplicationUserService;
+import com.application.app.cookbook.CookbookService;
 import com.application.app.ingredient.Ingredient;
 import com.application.app.ingredient.IngredientRequest;
 import com.application.app.ingredient.IngredientService;
+import com.application.app.recipe.comment.CommentService;
+import com.application.app.recipe.comment.RecipeCommentRequest;
 import com.application.app.recipe.specifications.*;
 import com.application.app.recipe.vote.RecipeVoteRequest;
 import com.application.app.recipe.vote.Vote;
@@ -42,7 +45,13 @@ public class RecipeService implements RecipeServiceInterface {
     private RecipeCategoryService categoryService;
 
     @Autowired
+    private CookbookService cookbookService;
+
+    @Autowired
     private VoteService voteService;
+
+    @Autowired
+    private CommentService commentService;
 
     @Override
     public Recipe createRecipe(RecipeRequest recipeRequest) {
@@ -128,6 +137,11 @@ public class RecipeService implements RecipeServiceInterface {
     @Override
     public void deleteRecipe(Long id) {
         recipeRepositoryInterface.deleteById(id);
+    }
+
+    @Override
+    public void addRecipeToCookbook(Long recipeId, Long id) {
+        cookbookService.addRecipe(recipeId, id);
     }
 
     @Override
@@ -234,6 +248,14 @@ public class RecipeService implements RecipeServiceInterface {
             }
         }
         return voted;
+    }
+
+    @Override
+    public void addCommentToRecipe(Long recipeId, RecipeCommentRequest recipeCommentRequest) {
+        Recipe recipe = getRecipe(recipeId);
+        ApplicationUser user = userService.getUser(recipeCommentRequest.getUserId());
+
+        commentService.createComment(recipe, user, recipeCommentRequest.getComment());
     }
 
     private int[] getScores(List<Vote> votes) {
