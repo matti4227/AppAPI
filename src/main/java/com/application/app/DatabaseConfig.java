@@ -23,6 +23,10 @@ public class DatabaseConfig {
         config.setJdbcUrl(dbUrl);
         config.setUsername(dbUsername);
         config.setPassword(dbPassword);
+
+        config.setMaximumPoolSize(200);
+        config.setConnectionTimeout(3000000);
+        config.setLeakDetectionThreshold(3000000);
         return new HikariDataSource(config);
     }
 }
