@@ -1,71 +1,102 @@
-//package com.application.app.recipeCategory;
-//
-//import com.application.app.recipe.Recipe;
-//import com.application.app.recipe.RecipeRepositoryInterface;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.List;
-//
-//@Service
-//public class RecipeCategoryService implements RecipeCategoryServiceInterface {
-//
-//    @Autowired
-//    private RecipeCategoryRepositoryInterface recipeCategoryRepositoryInterface;
-//
-//    @Autowired
-//    private RecipeRepositoryInterface recipeRepositoryInterface;
-//
-//    @Autowired
-//    private RecipeCategoryRepository recipeCategoryRepository;
-//
-//    @Override
-//    public List<RecipeCategory> getCategories() {
-//        return recipeCategoryRepositoryInterface.findAll();
-//    }
-//
-//    @Override
-//    public RecipeCategory getCategory(String categoryName) {
-//        return recipeCategoryRepositoryInterface.findByName(categoryName);
-//    }
-//
-//    @Override
-//    public RecipeCategory addCategory(String name) {
-//        RecipeCategory recipeCategory = new RecipeCategory();
-//        recipeCategory.setName(name);
-//        return recipeCategoryRepositoryInterface.save(recipeCategory);
-//    }
-//
-//    @Override
-//    public RecipeCategory addRecipeToCategory(String categoryName, Long recipeId) {
-//        Recipe recipe = recipeRepositoryInterface.findById(recipeId).orElse(null);
-//        RecipeCategory recipeCategory = getCategory(categoryName);
-//
-//        recipeCategory = recipeCategoryRepository.addRecipe(recipeCategory, recipe);
-//        return recipeCategoryRepositoryInterface.save(recipeCategory);
-//    }
-//
-//    @Override
-//    public RecipeCategory removeRecipeFromCategory(String categoryName, Long recipeId) {
-//        Recipe recipe = getRecipeFromRecipeCategory(categoryName, recipeId);
-//        RecipeCategory recipeCategory = getCategory(categoryName);
-//
-//        recipeCategory = recipeCategoryRepository.removeRecipe(recipeCategory, recipe);
-//        return recipeCategoryRepositoryInterface.save(recipeCategory);
-//    }
-//
-//    @Override
-//    public Recipe getRecipeFromRecipeCategory(String categoryName, Long recipeId) {
-//        RecipeCategory recipeCategory = getCategory(categoryName);
-//        Recipe recipe = null;
-//
-//        List<Recipe> recipes = recipeCategory.getRecipes();
-//        for (int x = 0; x < recipes.size(); x++) {
-//            if (recipeId == recipes.get(x).getId()) {
-//                recipe = recipes.get(x);
-//                break;
-//            }
-//        }
-//        return recipe;
-//    }
-//}
+package com.application.app.recipeCategory;
+
+import com.application.app.recipe.Recipe;
+import com.application.app.recipe.RecipeRepositoryInterface;
+import com.application.app.recipe.RecipeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@Transactional
+public class RecipeCategoryService implements RecipeCategoryServiceInterface {
+
+    @Autowired
+    private RecipeCategoryRepositoryInterface recipeCategoryRepositoryInterface;
+
+    @Autowired
+    private RecipeRepositoryInterface recipeRepositoryInterface;
+
+    @Autowired
+    private RecipeCategoryRepository recipeCategoryRepository;
+
+    @Autowired
+    private RecipeService recipeService;
+
+    @Override
+    public List<RecipeCategory> getAllCategories() {
+        return recipeCategoryRepositoryInterface.findAll();
+    }
+
+    @Override
+    public List<RecipeCategory> getCategories(List<RecipeCategoryRequest> categoryRequests) {
+        List<RecipeCategory> categories = new ArrayList<>();
+        RecipeCategory category;
+
+        for (int x = 0; x < categoryRequests.size(); x++) {
+            category = getCategory(categoryRequests.get(x).getName());
+            categories.add(category);
+        }
+
+        return categories;
+    }
+
+    @Override
+    public List<RecipeCategory> getCategoriesByRecipe(Recipe recipe) {
+        return recipeCategoryRepositoryInterface.findRecipeCategoriesByRecipes(recipe);
+    }
+
+    @Override
+    public RecipeCategory getCategory(String categoryName) {
+        return recipeCategoryRepositoryInterface.findByName(categoryName);
+    }
+
+    public List<Recipe> getRecipesByCategory(String categoryName) {
+        RecipeCategory category = getCategory(categoryName);
+        return recipeService.getRecipesByCategory(category);
+    }
+
+    @Override
+    public RecipeCategory addCategory(String name) {
+        RecipeCategory recipeCategory = new RecipeCategory();
+        recipeCategory.setName(name);
+        return recipeCategoryRepositoryInterface.save(recipeCategory);
+    }
+
+    @Override
+    public RecipeCategory addRecipeToCategory(String categoryName, Long recipeId) {
+        Recipe recipe = recipeService.getRecipe(recipeId);
+        RecipeCategory recipeCategory = getCategory(categoryName);
+
+        recipeCategory = recipeCategoryRepository.addRecipe(recipeCategory, recipe);
+        return recipeCategoryRepositoryInterface.save(recipeCategory);
+    }
+
+    @Override
+    public void removeRecipeFromCategories(Long recipeId) {
+        Recipe recipe = recipeService.getRecipe(recipeId);
+        List<RecipeCategory> categories = getCategoriesByRecipe(recipe);
+
+        for (int x = 0; x < categories.size(); x++) {
+            recipeCategoryRepository.removeRecipe(categories.get(x), recipe);
+        }
+    }
+
+    @Override
+    public Recipe getRecipeFromRecipeCategory(String categoryName, Long recipeId) {
+        RecipeCategory recipeCategory = getCategory(categoryName);
+        Recipe recipe = null;
+
+        List<Recipe> recipes = recipeCategory.getRecipes();
+        for (int x = 0; x < recipes.size(); x++) {
+            if (recipeId == recipes.get(x).getId()) {
+                recipe = recipes.get(x);
+                break;
+            }
+        }
+        return recipe;
+    }
+}

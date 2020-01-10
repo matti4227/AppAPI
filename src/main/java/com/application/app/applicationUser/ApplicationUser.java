@@ -3,6 +3,7 @@ package com.application.app.applicationUser;
 import com.application.app.cookbook.Cookbook;
 import com.application.app.fridge.Fridge;
 import com.application.app.recipe.Recipe;
+import com.application.app.recipe.vote.Vote;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,4 +61,8 @@ public class ApplicationUser {
     @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     private Fridge fridge;
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Vote> votes = new ArrayList<>();
 }

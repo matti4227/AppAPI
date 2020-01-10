@@ -3,6 +3,8 @@ package com.application.app.recipe;
 import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.cookbook.Cookbook;
 import com.application.app.ingredient.Ingredient;
+import com.application.app.recipe.vote.Vote;
+import com.application.app.recipeCategory.RecipeCategory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
@@ -47,6 +49,10 @@ public class Recipe {
 
     private float rating;
 
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", fetch = FetchType.LAZY)
+    private List<Vote> votes = new ArrayList<>();
+
     @Column(updatable = false)
     @CreationTimestamp
     private Timestamp createdDate;
@@ -72,9 +78,14 @@ public class Recipe {
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", fetch = FetchType.LAZY)
 //    private List<RecipePicture> recipePictures = new ArrayList<>();
 
-//    @JsonManagedReference
-//    @ManyToMany(mappedBy = "recipes", fetch = FetchType.LAZY)
-//    private List<RecipeCategory> recipeCategories = new ArrayList<>();
+    @JsonBackReference
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "category_recipe",
+            joinColumns = @JoinColumn(name = "id_recipe"),
+            inverseJoinColumns = @JoinColumn(name = "id_recipe_category")
+    )
+    private List<RecipeCategory> recipeCategories = new ArrayList<>();
 
     @JsonManagedReference
     @ManyToMany(mappedBy = "recipes", fetch = FetchType.LAZY)

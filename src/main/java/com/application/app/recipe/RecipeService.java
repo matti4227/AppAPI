@@ -3,10 +3,14 @@ package com.application.app.recipe;
 import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.applicationUser.ApplicationUserService;
 import com.application.app.ingredient.Ingredient;
+import com.application.app.ingredient.IngredientRequest;
 import com.application.app.ingredient.IngredientService;
-import com.application.app.recipe.specifications.RecipeWithDifficulty;
-import com.application.app.recipe.specifications.RecipeWithNameSearch;
-import com.application.app.recipe.specifications.RecipeWithPreparationTime;
+import com.application.app.recipe.specifications.*;
+import com.application.app.recipe.vote.RecipeVoteRequest;
+import com.application.app.recipe.vote.Vote;
+import com.application.app.recipe.vote.VoteService;
+import com.application.app.recipeCategory.RecipeCategory;
+import com.application.app.recipeCategory.RecipeCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service(value = "recipeService")
@@ -32,6 +38,12 @@ public class RecipeService implements RecipeServiceInterface {
     @Autowired
     private IngredientService ingredientService;
 
+    @Autowired
+    private RecipeCategoryService categoryService;
+
+    @Autowired
+    private VoteService voteService;
+
     @Override
     public Recipe createRecipe(RecipeRequest recipeRequest) {
         ApplicationUser user = userService.getUser(recipeRequest.getUserId());
@@ -44,6 +56,13 @@ public class RecipeService implements RecipeServiceInterface {
             addIngredients(recipe, ingredients);
         }
 
+        recipe = recipeRepositoryInterface.save(recipe);
+
+        if (recipeRequest.getCategories().size() > 0) {
+            List<RecipeCategory> categories = categoryService.getCategories(recipeRequest.getCategories());
+            addRecipeToCategories(recipe, categories);
+        }
+
         return recipeRepositoryInterface.save(recipe);
     }
 
@@ -52,29 +71,24 @@ public class RecipeService implements RecipeServiceInterface {
         return recipeRepositoryInterface.findById(id).orElse(null);
     }
 
-//    @Override
-//    public RecipePageResponse getRecipes(int page) {
-//        Page<Recipe> recipePage = recipeRepositoryInterface.findAll(PageRequest.of(page, 3));
-//        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages());
-//    }
-
     @Override
-    public RecipePageResponse getRecipesByParameters(int difficulty, int preparationTime, int sort, int page) {
+    public RecipePageResponse getRecipesByParameters(List<IngredientRequest> ingredientRequestList, String categoryName, int difficulty, int preparationTime, int sort, int page) {
+        RecipeCategory recipeCategory = getCategoryFromParameter(categoryName);
         Specification<Recipe> spec = Specification
                 .where(new RecipeWithDifficulty(difficulty))
-                .and(new RecipeWithPreparationTime(preparationTime));
+                .and(new RecipeWithPreparationTime(preparationTime)
+                .and(new RecipeWithRecipeCategory(recipeCategory)));
 
-        Pageable pageRequest;
+        if (ingredientRequestList.size() > 0) {
+            List<Ingredient> ingredients = ingredientService.getIngredients(ingredientRequestList);
 
-        if (sort == 1) {
-            Sort s = Sort.by("createdDate").ascending();
-            pageRequest = PageRequest.of(page, 3, s);
-        } else if (sort == 2) {
-            Sort s = Sort.by("createdDate").descending();
-            pageRequest = PageRequest.of(page, 3, s);
-        } else {
-            pageRequest = PageRequest.of(page, 3);
+            for (int x = 0; x < ingredients.size(); x++) {
+                spec = spec.and(new RecipeWithIngredient(ingredients.get(x)));
+            }
         }
+
+        Sort s = getSortFromParameter(sort);
+        Pageable pageRequest = PageRequest.of(page, 3, s);
 
         Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, pageRequest);
 
@@ -82,10 +96,32 @@ public class RecipeService implements RecipeServiceInterface {
     }
 
     @Override
+    public List<Recipe> getRecipesByCategory(RecipeCategory category) {
+        return recipeRepositoryInterface.findRecipeByRecipeCategories(category);
+    }
+
+    @Override
     public RecipePageResponse getRecipesByNameSearch(String name, int page) {
         Specification<Recipe> spec = Specification.where(new RecipeWithNameSearch(name));
 
         Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, PageRequest.of(page, 3));
+        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages());
+    }
+
+    @Override
+    public RecipePageResponse getRecipesByIngredients(List<IngredientRequest> ingredientRequestList, int page) {
+        List<Ingredient> ingredients = ingredientService.getIngredients(ingredientRequestList);
+        Specification<Recipe> spec = Specification.where(new RecipeWithIngredient(ingredients.get(0)));
+
+        if (ingredients.size() > 1) {
+            for (int x = 1; x < ingredients.size(); x++) {
+                spec = spec.and(new RecipeWithIngredient(ingredients.get(x)));
+            }
+        }
+
+        Pageable pageRequest = PageRequest.of(page, 3);
+        Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, pageRequest);
+
         return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages());
     }
 
@@ -99,24 +135,120 @@ public class RecipeService implements RecipeServiceInterface {
         Recipe originalRecipe = getRecipe(recipeId);
         Recipe recipe = recipeRepository.updateRecipe(originalRecipe, recipeRequest);
 
+        recipe = recipeRepositoryInterface.save(recipe);
+
         if (recipeRequest.getIngredients().size() > 0) {
             removeIngredients(recipe);
             List<Ingredient> ingredients = ingredientService.getIngredients(recipeRequest.getIngredients());
             addIngredients(recipe, ingredients);
         }
 
+        recipe = recipeRepositoryInterface.save(recipe);
+
+        if (recipeRequest.getCategories().size() > 0) {
+            List<RecipeCategory> categories = categoryService.getCategories(recipeRequest.getCategories());
+            removeRecipeFromCategories(recipe);
+            addRecipeToCategories(recipe, categories);
+        }
+
         return recipeRepositoryInterface.save(recipe);
     }
 
     @Override
-    public Recipe addIngredients(Recipe recipe, List<Ingredient> ingredients) {
-        return recipeRepository.addIngredients(recipe, ingredients);
+    public void addRecipeToCategories(Recipe recipe, List<RecipeCategory> categories) {
+        for (int x = 0; x < categories.size(); x++) {
+            categoryService.addRecipeToCategory(categories.get(x).getName(), recipe.getId());
+        }
+    }
+
+    @Override
+    public void removeRecipeFromCategories(Recipe recipe) {
+        categoryService.removeRecipeFromCategories(recipe.getId());
+    }
+
+    @Override
+    public void addIngredients(Recipe recipe, List<Ingredient> ingredients) {
+        recipeRepository.addIngredients(recipe, ingredients);
     }
 
     @Override
     public void removeIngredients(Recipe recipe) {
         List<Ingredient> ingredients = recipe.getIngredients();
         recipeRepository.removeIngredients(recipe, ingredients);
+    }
+
+    @Override
+    public RecipeCategory getCategoryFromParameter(String categoryName) {
+        if (categoryName == "") {
+            return null;
+        } else {
+            return categoryService.getCategory(categoryName);
+        }
+    }
+
+    @Override
+    public Sort getSortFromParameter(int sort) {
+        if (sort == 1) {
+            return Sort.by("createdDate").ascending();
+        } else if (sort == 2) {
+            return Sort.by("createdDate").descending();
+        } else {
+            return Sort.by("createdDate").ascending();
+        }
+    }
+
+    @Override
+    public void addScoreToRecipe(Long recipeId, RecipeVoteRequest recipeVoteRequest) throws Exception {
+        Recipe recipe = getRecipe(recipeId);
+        ApplicationUser user = userService.getUser(recipeVoteRequest.getUserId());
+
+        List<Vote> votes = voteService.getVotesByRecipe(recipe);
+        Boolean alreadyVoted = userAlreadyVoted(user.getId(), votes);
+
+        if (alreadyVoted == false) {
+            voteService.createVote(recipe, user, recipeVoteRequest.getScore());
+
+            recipe = getRecipe(recipeId);
+
+            updateRating(recipe, recipe.getVotes());
+        } else {
+            throw new Exception();
+        }
+    }
+
+    @Override
+    public void updateRating(Recipe recipe, List<Vote> votes) {
+        int[] scores = getScores(votes);
+        float rating = calculateRating(scores);
+
+        recipeRepository.updateRecipeRating(recipe, rating);
+    }
+
+    @Override
+    public Boolean userAlreadyVoted(Long userId, List<Vote> votes) {
+        Boolean voted = false;
+
+        for (int x = 0; x < votes.size(); x++) {
+            if (userId == votes.get(x).getUser().getId()) {
+                voted = true;
+            }
+        }
+        return voted;
+    }
+
+    private int[] getScores(List<Vote> votes) {
+        int[] scores = new int[votes.size()];
+
+        for (int x = 0; x < votes.size(); x++) {
+            scores[x] = votes.get(x).getScore();
+        }
+
+        return scores;
+    }
+
+    private float calculateRating(int[] scores) {
+        int sum = Arrays.stream(scores).sum();
+        return (float) sum / scores.length;
     }
 
 //    @Override

@@ -17,8 +17,8 @@ public class RecipeWithPreparationTime implements Specification<Recipe> {
     @Override
     public Predicate toPredicate(Root<Recipe> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         if (preparationTime == 0) {
-            return cb.isTrue(cb.literal(true)); // always true = no filtering
+            return cb.isTrue(cb.literal(true));
         }
-        return cb.equal(root.get("preparationTime"), this.preparationTime);
+        return cb.equal(root.get("preparationTime"), preparationTime);
     }
 }

@@ -1,6 +1,7 @@
 package com.application.app.recipe;
 
 import com.application.app.ingredient.IngredientRequest;
+import com.application.app.recipeCategory.RecipeCategoryRequest;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,5 +18,6 @@ public class RecipeRequest {
     private int difficulty;
     private Long userId;
     private List<IngredientRequest> ingredients;
+    private List<RecipeCategoryRequest> categories;
 
 }

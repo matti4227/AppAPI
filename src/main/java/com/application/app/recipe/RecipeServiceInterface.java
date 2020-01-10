@@ -1,8 +1,13 @@
 package com.application.app.recipe;
 
 import com.application.app.ingredient.Ingredient;
+import com.application.app.ingredient.IngredientRequest;
+import com.application.app.recipe.vote.RecipeVoteRequest;
+import com.application.app.recipe.vote.Vote;
+import com.application.app.recipeCategory.RecipeCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -15,19 +20,35 @@ public interface RecipeServiceInterface {
 
     Recipe getRecipe(Long id);
 
-//    RecipePageResponse getRecipes(int page);
-
-    RecipePageResponse getRecipesByParameters(int difficulty, int preparationTime, int sort, int page);
+    RecipePageResponse getRecipesByParameters(List<IngredientRequest> ingredientRequestList, String categoryName, int difficulty, int preparationTime, int sort, int page);
 
     RecipePageResponse getRecipesByNameSearch(String name, int page);
+
+    RecipePageResponse getRecipesByIngredients(List<IngredientRequest> ingredientRequestList, int page);
+
+    List<Recipe> getRecipesByCategory(RecipeCategory category);
 
     Recipe updateRecipe(Long id, RecipeRequest recipeRequest);
 
     void deleteRecipe(Long id);
 
-    Recipe addIngredients(Recipe recipe, List<Ingredient> ingredients);
+    void addRecipeToCategories(Recipe recipe, List<RecipeCategory> categories);
+
+    void removeRecipeFromCategories(Recipe recipe);
+
+    void addIngredients(Recipe recipe, List<Ingredient> ingredients);
 
     void removeIngredients(Recipe recipe);
+
+    RecipeCategory getCategoryFromParameter(String categoryName);
+
+    Sort getSortFromParameter(int sort);
+
+    void addScoreToRecipe(Long recipeId, RecipeVoteRequest recipeVoteRequest) throws Exception;
+
+    void updateRating(Recipe recipe, List<Vote> votes);
+
+    Boolean userAlreadyVoted(Long userId, List<Vote> votes);
 
 //    Ingredient getIngredientFromRecipe(Long recipeId, String ingredientName);
 }

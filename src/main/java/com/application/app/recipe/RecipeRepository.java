@@ -50,6 +50,19 @@ public class RecipeRepository {
         return originalRecipe;
     }
 
+    public Recipe updateRecipeRating(Recipe recipe, float rating) {
+
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+
+        recipe.setRating(rating);
+
+        entityManager.merge(recipe);
+        entityManager.getTransaction().commit();
+
+        return recipe;
+    }
+
     public Recipe addIngredients(Recipe recipe, List<Ingredient> ingredients) {
 
         EntityManager entityManager = entityManagerFactory.createEntityManager();

@@ -1,12 +1,9 @@
 package com.application.app.recipe;
 
 import com.application.app.cookbook.CookbookService;
-import net.kaczmarzyk.spring.data.jpa.domain.Equal;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
+import com.application.app.ingredient.IngredientRequest;
+import com.application.app.recipe.vote.RecipeVoteRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -65,12 +62,14 @@ public class RecipeController {
 
     @GetMapping(value = "")
     public ResponseEntity<RecipePageResponse> getRecipesByParameters(
+            @RequestBody List<IngredientRequest> ingredientRequestList,
+            @RequestParam(value = "category", defaultValue = "") String categoryName,
             @RequestParam(value = "diff", defaultValue = "0") int difficulty,
             @RequestParam(value = "prepTime", defaultValue = "0") int preparationTime,
             @RequestParam(value = "sort", defaultValue = "0") int sort,
             @RequestParam(value = "page", defaultValue = "0") int page) {
         try {
-            RecipePageResponse response = recipeService.getRecipesByParameters(difficulty, preparationTime, sort, page);
+            RecipePageResponse response = recipeService.getRecipesByParameters(ingredientRequestList, categoryName, difficulty, preparationTime, sort, page);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -83,6 +82,18 @@ public class RecipeController {
             @RequestParam(value = "page", defaultValue = "0") int page) {
         try {
             RecipePageResponse response = recipeService.getRecipesByNameSearch(name, page);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception er) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(value = "/search/a")
+    public ResponseEntity<RecipePageResponse> getRecipesByIngredients(
+            @RequestBody List<IngredientRequest> ingredientRequestList,
+            @RequestParam(value = "page", defaultValue = "0") int page) {
+        try {
+            RecipePageResponse response = recipeService.getRecipesByIngredients(ingredientRequestList, page);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -114,6 +125,17 @@ public class RecipeController {
                                                 @RequestBody RecipeCookbookRequest recipeCookbookRequest) {
         try {
             cookbookService.addRecipe(recipeId, recipeCookbookRequest.getId());
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        } catch (Exception er) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PatchMapping(value = "/{id}")
+    public ResponseEntity<Object> rateRecipe(@PathVariable(value = "id") Long recipeId,
+                                             @RequestBody RecipeVoteRequest recipeVoteRequest) {
+        try {
+            recipeService.addScoreToRecipe(recipeId, recipeVoteRequest);
             return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

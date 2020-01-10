@@ -17,8 +17,8 @@ public class RecipeWithDifficulty implements Specification<Recipe> {
     @Override
     public Predicate toPredicate(Root<Recipe> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         if (difficulty == 0) {
-            return cb.isTrue(cb.literal(true)); // always true = no filtering
+            return cb.isTrue(cb.literal(true));
         }
-        return cb.equal(root.get("difficulty"), this.difficulty);
+        return cb.equal(root.get("difficulty"), difficulty);
     }
 }

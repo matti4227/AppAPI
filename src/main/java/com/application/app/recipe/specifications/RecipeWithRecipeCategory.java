@@ -1,6 +1,7 @@
 package com.application.app.recipe.specifications;
 
 import com.application.app.recipe.Recipe;
+import com.application.app.recipeCategory.RecipeCategory;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -10,15 +11,15 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 @AllArgsConstructor
-public class RecipeWithNameSearch implements Specification<Recipe> {
+public class RecipeWithRecipeCategory implements Specification<Recipe> {
 
-    private String name;
+    private RecipeCategory category;
 
     @Override
     public Predicate toPredicate(Root<Recipe> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-        if (name == null) {
+        if (category == null) {
             return cb.isTrue(cb.literal(true));
         }
-        return cb.like(root.get("name"), "%" + name + "%");
+        return cb.isMember(category, root.get("recipeCategories"));
     }
 }
