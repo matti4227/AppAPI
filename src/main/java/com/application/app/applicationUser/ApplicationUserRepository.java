@@ -30,9 +30,6 @@ public class ApplicationUserRepository {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
 
-        if (userRequest.getUsername() != null) {
-            originalUser.setUsername(userRequest.getUsername());
-        }
         if (userRequest.getPassword() != null) {
             originalUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         }

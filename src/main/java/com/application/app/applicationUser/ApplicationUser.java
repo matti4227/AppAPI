@@ -40,7 +40,7 @@ public class ApplicationUser {
     private String email;
 
     @NotBlank
-    @Column(unique = true)
+    @Column(unique = true, updatable = false)
     @Size(min = 3, max = 24)
     private String username;
 

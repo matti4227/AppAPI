@@ -1,5 +1,6 @@
 package com.application.app.applicationUser;
 
+import com.application.app.recipe.Recipe;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,4 +11,10 @@ public interface ApplicationUserRepositoryInterface extends JpaRepository<Applic
     ApplicationUser findByUsername(String username);
 
     Optional<ApplicationUser> findById(Long id);
+
+    ApplicationUser findByCookbookId(Long id);
+
+    ApplicationUser findByFridgeId(Long id);
+
+    ApplicationUser findByRecipes(Recipe recipe);
 }

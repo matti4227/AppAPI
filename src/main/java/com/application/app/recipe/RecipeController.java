@@ -4,6 +4,7 @@ import com.application.app.cookbook.CookbookService;
 import com.application.app.ingredient.IngredientRequest;
 import com.application.app.recipe.comment.RecipeCommentRequest;
 import com.application.app.recipe.vote.RecipeVoteRequest;
+import com.application.app.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ public class RecipeController {
 
     @Autowired
     private RecipeService recipeService;
+
+    @Autowired
+    private SecurityService securityService;
 
     @PostMapping(value = "/create")
     public ResponseEntity<Recipe> createRecipe(@RequestBody RecipeRequest recipeRequest) {
@@ -37,26 +41,6 @@ public class RecipeController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
-//    @GetMapping(value = "")
-//    public ResponseEntity<List<Recipe>> getRecipes() {
-//        try {
-//            List<Recipe> response = recipeService.getRecipes();
-//            return new ResponseEntity<>(response, HttpStatus.OK);
-//        } catch (Exception er) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//    }
-
-//    @GetMapping(value = "")
-//    public  ResponseEntity<RecipePageResponse> getRecipes(@RequestParam(value = "page", defaultValue = "0") int page) {
-//        try {
-//            RecipePageResponse response = recipeService.getRecipes(page);
-//            return new ResponseEntity<>(response, HttpStatus.OK);
-//        } catch (Exception er) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//    }
 
     @GetMapping(value = "")
     public ResponseEntity<RecipePageResponse> getRecipesByParameters(
@@ -101,8 +85,12 @@ public class RecipeController {
     @PutMapping(value = "/{id}/edit")
     public ResponseEntity<Recipe> updateRecipe(@PathVariable Long id, @RequestBody RecipeRequest recipeRequest) {
         try {
-            Recipe response = recipeService.updateRecipe(id, recipeRequest);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            if (securityService.isSecuredUpdateRecipe(id) == true) {
+                Recipe response = recipeService.updateRecipe(id, recipeRequest);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                throw new Exception();
+            }
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -111,8 +99,12 @@ public class RecipeController {
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Object> deleteRecipe(@PathVariable(value = "id") Long id) {
         try {
-            recipeService.deleteRecipe(id);
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            if (securityService.isSecuredDeleteRecipe(id) == true) {
+                recipeService.deleteRecipe(id);
+                return new ResponseEntity<>(null, HttpStatus.OK);
+            } else {
+                throw new Exception();
+            }
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -122,8 +114,12 @@ public class RecipeController {
     public ResponseEntity<Object> addToCookbook(@PathVariable(value = "id") Long recipeId,
                                                 @RequestBody RecipeCookbookRequest recipeCookbookRequest) {
         try {
-            recipeService.addRecipeToCookbook(recipeId, recipeCookbookRequest.getId());
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            if (securityService.isSecuredAddRecipeToCookbook(recipeCookbookRequest.getId()) == true) {
+                recipeService.addRecipeToCookbook(recipeId, recipeCookbookRequest.getId());
+                return new ResponseEntity<>(null, HttpStatus.OK);
+            } else {
+                throw new Exception();
+            }
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

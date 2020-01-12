@@ -2,9 +2,11 @@ package com.application.app.applicationUser;
 
 import com.application.app.cookbook.CookbookService;
 import com.application.app.fridge.FridgeService;
+import com.application.app.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +26,9 @@ public class ApplicationUserController {
 
     @Autowired
     private FridgeService fridgeService;
+
+    @Autowired
+    private SecurityService securityService;
 
     @PostMapping(value = SIGN_UP_URL)
     public ResponseEntity<?> createUser(@RequestBody ApplicationUserRequest userRequest) {
@@ -61,10 +66,15 @@ public class ApplicationUserController {
     }
 
     @PatchMapping(value = "/users/{id}/edit")
-    public ResponseEntity<ApplicationUser> updateUser(@RequestBody ApplicationUserRequest userRequest) {
+    public ResponseEntity<ApplicationUser> updateUser(@PathVariable(value = "id") Long id,
+                                                      @RequestBody ApplicationUserRequest userRequest) {
         try {
-            ApplicationUser response = userService.updateUser(userRequest);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            if (securityService.isSecuredUpdateUser(id) == true) {
+                ApplicationUser response = userService.updateUser(id, userRequest);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                throw new Exception();
+            }
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -74,8 +84,12 @@ public class ApplicationUserController {
     public ResponseEntity<ApplicationUser> updateUserAvatar(@RequestParam(value = "file") MultipartFile file,
                                                             @PathVariable(value = "id") Long id) {
         try {
-            ApplicationUser response = userService.updateUserAvatar(id, file.getBytes());
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            if (securityService.isSecuredUpdateUserAvatar(id) == true) {
+                ApplicationUser response = userService.updateUserAvatar(id, file.getBytes());
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                throw new Exception();
+            }
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

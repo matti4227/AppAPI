@@ -8,13 +8,19 @@ public interface ApplicationUserServiceInterface {
 
     ApplicationUser getUser(Long id);
 
+    ApplicationUser getUserByCookbook(Long id);
+
+    ApplicationUser getUserByFridge(Long id);
+
+    ApplicationUser getUserByRecipe(Long id);
+
     ApplicationUserResponse getResponseUser(ApplicationUser user) throws Exception;
 
     ApplicationUser getUserByName(String username);
 
     List<ApplicationUser> getUsers();
 
-    ApplicationUser updateUser(ApplicationUserRequest userRequest);
+    ApplicationUser updateUser(Long id, ApplicationUserRequest userRequest);
 
     ApplicationUser updateUserAvatar(Long id, byte[] avatar);
 }

@@ -1,5 +1,7 @@
 package com.application.app.applicationUser;
 
+import com.application.app.recipe.Recipe;
+import com.application.app.recipe.RecipeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,8 +20,8 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-//    @Autowired
-//    private CookbookRepositoryInterface cookbookRepositoryInterface;
+    @Autowired
+    private RecipeService recipeService;
 
     @Override
     public ApplicationUser createUser(ApplicationUserRequest userRequest) {
@@ -31,6 +33,22 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
     @Override
     public ApplicationUser getUser(Long id) {
         return userRepositoryInterface.findById(id).orElse(null);
+    }
+
+    @Override
+    public ApplicationUser getUserByCookbook(Long id) {
+        return userRepositoryInterface.findByCookbookId(id);
+    }
+
+    @Override
+    public ApplicationUser getUserByFridge(Long id) {
+        return userRepositoryInterface.findByFridgeId(id);
+    }
+
+    @Override
+    public ApplicationUser getUserByRecipe(Long id) {
+        Recipe recipe = recipeService.getRecipe(id);
+        return userRepositoryInterface.findByRecipes(recipe);
     }
 
     @Override
@@ -49,18 +67,16 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
     @Override
     public ApplicationUser getUserByName(String username) {
         return userRepositoryInterface.findByUsername(username);
-        //być może stworzyć domyślną wartość
     }
 
     @Override
     public List<ApplicationUser> getUsers() {
         return userRepositoryInterface.findAll();
-        //do zmiany
     }
 
     @Override
-    public ApplicationUser updateUser(ApplicationUserRequest userRequest) {
-        ApplicationUser originalUser = getUserByName(userRequest.getUsername());
+    public ApplicationUser updateUser(Long id, ApplicationUserRequest userRequest) {
+        ApplicationUser originalUser = getUser(id);
         return userRepository.updateUser(originalUser, userRequest);
     }
 

@@ -8,7 +8,7 @@ public interface CookbookServiceInterface {
 
     Cookbook getCookbook(Long cookbookId);
 
-    Recipe getRecipeFromCookbook(Long cookbookId, Long recipeId);
+    Recipe getRecipeFromCookbook(Long recipeId);
 
     Cookbook addRecipe(Long recipeId, Long cookbookId);
 
