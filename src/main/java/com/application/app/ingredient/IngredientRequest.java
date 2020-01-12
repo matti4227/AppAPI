@@ -8,4 +8,5 @@ import lombok.Setter;
 public class IngredientRequest {
     private Long id;
     private String ingredientName;
+    private String amount;
 }

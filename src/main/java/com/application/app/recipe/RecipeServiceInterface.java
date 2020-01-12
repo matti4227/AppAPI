@@ -39,7 +39,7 @@ public interface RecipeServiceInterface {
 
     void removeRecipeFromCategories(Recipe recipe);
 
-    void addIngredients(Recipe recipe, List<Ingredient> ingredients);
+    void addIngredients(Recipe recipe, List<Ingredient> ingredients, List<IngredientRequest> ingredientRequests);
 
     void removeIngredients(Recipe recipe);
 

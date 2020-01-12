@@ -4,6 +4,7 @@ import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.cookbook.Cookbook;
 import com.application.app.ingredient.Ingredient;
 import com.application.app.recipe.comment.Comment;
+import com.application.app.recipe.recipeIngredient.RecipeIngredient;
 import com.application.app.recipe.vote.Vote;
 import com.application.app.recipeCategory.RecipeCategory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -95,4 +96,8 @@ public class Recipe {
     @JsonManagedReference
     @ManyToMany(mappedBy = "recipes", fetch = FetchType.LAZY)
     private List<Ingredient> ingredients = new ArrayList<>();
+
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", fetch = FetchType.LAZY)
+    private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
 }

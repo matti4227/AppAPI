@@ -2,7 +2,9 @@ package com.application.app.ingredient;
 
 import com.application.app.fridge.Fridge;
 import com.application.app.recipe.Recipe;
+import com.application.app.recipe.recipeIngredient.RecipeIngredient;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,4 +43,8 @@ public class Ingredient {
             inverseJoinColumns = @JoinColumn(name = "id_fridge")
     )
     private List<Fridge> fridges = new ArrayList<>();
+
+//    @JsonManagedReference
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", fetch = FetchType.LAZY)
+//    private List<RecipeIngredient> recipeIngredients = new ArrayList<>();
 }

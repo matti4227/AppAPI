@@ -2,6 +2,7 @@ package com.application.app.recipe;
 
 import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.ingredient.Ingredient;
+import com.application.app.recipe.recipeIngredient.RecipeIngredient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -91,6 +92,14 @@ public class RecipeRepository {
 
         entityManager.merge(recipe);
         entityManager.getTransaction().commit();
+
+        return recipe;
+    }
+
+    public Recipe addRecipeIngredients(Recipe recipe, List<RecipeIngredient> recipeIngredients) {
+        for (int x = 0; x < recipeIngredients.size(); x++) {
+            recipe.getRecipeIngredients().add(recipeIngredients.get(x));
+        }
 
         return recipe;
     }

@@ -8,6 +8,8 @@ import com.application.app.ingredient.IngredientRequest;
 import com.application.app.ingredient.IngredientService;
 import com.application.app.recipe.comment.CommentService;
 import com.application.app.recipe.comment.RecipeCommentRequest;
+import com.application.app.recipe.recipeIngredient.RecipeIngredient;
+import com.application.app.recipe.recipeIngredient.RecipeIngredientService;
 import com.application.app.recipe.specifications.*;
 import com.application.app.recipe.vote.RecipeVoteRequest;
 import com.application.app.recipe.vote.Vote;
@@ -22,7 +24,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,6 +41,9 @@ public class RecipeService implements RecipeServiceInterface {
 
     @Autowired
     private IngredientService ingredientService;
+
+    @Autowired
+    private RecipeIngredientService recipeIngredientService;
 
     @Autowired
     private RecipeCategoryService categoryService;
@@ -62,7 +66,7 @@ public class RecipeService implements RecipeServiceInterface {
 
         if (recipeRequest.getIngredients().size() > 0) {
             List<Ingredient> ingredients = ingredientService.getIngredients(recipeRequest.getIngredients());
-            addIngredients(recipe, ingredients);
+            addIngredients(recipe, ingredients, recipeRequest.getIngredients());
         }
 
         recipe = recipeRepositoryInterface.save(recipe);
@@ -71,8 +75,8 @@ public class RecipeService implements RecipeServiceInterface {
             List<RecipeCategory> categories = categoryService.getCategories(recipeRequest.getCategories());
             addRecipeToCategories(recipe, categories);
         }
-
-        return recipeRepositoryInterface.save(recipe);
+        recipe = recipeRepositoryInterface.save(recipe);
+        return recipe;
     }
 
     @Override
@@ -154,7 +158,7 @@ public class RecipeService implements RecipeServiceInterface {
         if (recipeRequest.getIngredients().size() > 0) {
             removeIngredients(recipe);
             List<Ingredient> ingredients = ingredientService.getIngredients(recipeRequest.getIngredients());
-            addIngredients(recipe, ingredients);
+            addIngredients(recipe, ingredients, recipeRequest.getIngredients());
         }
 
         recipe = recipeRepositoryInterface.save(recipe);
@@ -181,14 +185,19 @@ public class RecipeService implements RecipeServiceInterface {
     }
 
     @Override
-    public void addIngredients(Recipe recipe, List<Ingredient> ingredients) {
+    public void addIngredients(Recipe recipe, List<Ingredient> ingredients, List<IngredientRequest> ingredientRequests) {
         recipeRepository.addIngredients(recipe, ingredients);
+        List<RecipeIngredient> recipeIngredients = recipeIngredientService.createRecipeIngredients(recipe, ingredientRequests);
+
+        recipe = recipeRepository.addRecipeIngredients(recipe, recipeIngredients);
+        recipeRepositoryInterface.save(recipe);
     }
 
     @Override
     public void removeIngredients(Recipe recipe) {
         List<Ingredient> ingredients = recipe.getIngredients();
         recipeRepository.removeIngredients(recipe, ingredients);
+        recipeIngredientService.deleteRecipeIngredients(recipe);
     }
 
     @Override
@@ -206,6 +215,10 @@ public class RecipeService implements RecipeServiceInterface {
             return Sort.by("createdDate").ascending();
         } else if (sort == 2) {
             return Sort.by("createdDate").descending();
+        } else if (sort == 3) {
+            return Sort.by("rating").ascending();
+        } else if (sort == 4) {
+            return Sort.by("rating").descending();
         } else {
             return Sort.by("createdDate").ascending();
         }
@@ -272,21 +285,4 @@ public class RecipeService implements RecipeServiceInterface {
         int sum = Arrays.stream(scores).sum();
         return (float) sum / scores.length;
     }
-
-//    @Override
-//    public Ingredient getIngredientFromRecipe(Long recipeId, String ingredientName) {
-//
-//        Recipe recipe = getRecipe(recipeId);
-//        Ingredient ingredient = null;
-//
-//        List<Ingredient> ingredients = recipe.getIngredients();
-//        for (int x = 0; x < ingredients.size(); x++) {
-//            if (ingredientName == ingredients.get(x).getName()) {
-//                ingredient = ingredients.get(x);
-//                break;
-//            }
-//        }
-//
-//        return ingredient;
-//    }
 }
