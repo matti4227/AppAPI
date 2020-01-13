@@ -16,29 +16,29 @@ import static com.application.app.security.SecurityConstants.AUTHENTICATE_URL;
 @RestController
 @CrossOrigin
 @RequestMapping(value = AUTHENTICATE_URL)
-public class JwtAuthenticationController {
+public class JWTAuthenticationController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private JWTTokenUtil jwtTokenUtil;
 
     @Autowired
-    private JwtUserDetailsService userDetailsService;
+    private JWTUserDetailsService userDetailsService;
 
     @Autowired
     private ApplicationUserService applicationUserService;
 
     @PostMapping(value = "")
-    public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+    public ResponseEntity<AuthenticationResponse> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
 
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDetails);
 
         Long id = applicationUserService.getUserByName(userDetails.getUsername()).getId();
-        JwtResponse response = new JwtResponse(id, userDetails.getUsername(), token);
+        AuthenticationResponse response = new AuthenticationResponse(id, userDetails.getUsername(), token, userDetails.getAuthorities().toString());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

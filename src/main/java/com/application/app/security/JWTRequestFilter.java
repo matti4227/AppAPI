@@ -19,19 +19,19 @@ import static com.application.app.security.SecurityConstants.HEADER_STRING;
 import static com.application.app.security.SecurityConstants.TOKEN_PREFIX;
 
 @Component
-public class JwtRequestFilter extends OncePerRequestFilter {
+public class JWTRequestFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
+    private JWTUserDetailsService jwtUserDetailsService;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private JWTTokenUtil jwtTokenUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        final String requestTokenHeader = request.getHeader(HEADER_STRING);
+        String requestTokenHeader = request.getHeader(HEADER_STRING);
         String username = null;
         String jwtToken = null;
 

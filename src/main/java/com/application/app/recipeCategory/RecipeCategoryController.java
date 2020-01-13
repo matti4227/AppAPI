@@ -4,6 +4,7 @@ import com.application.app.recipe.Recipe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class RecipeCategoryController {
     @Autowired
     private RecipeCategoryService recipeCategoryService;
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public ResponseEntity<RecipeCategory> createRecipeCategory(@RequestBody RecipeCategoryRequest recipeCategoryRequest ) {
         try {

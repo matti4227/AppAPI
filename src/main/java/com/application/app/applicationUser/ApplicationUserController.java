@@ -65,6 +65,7 @@ public class ApplicationUserController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @PatchMapping(value = "/users/{id}/edit")
     public ResponseEntity<ApplicationUser> updateUser(@PathVariable(value = "id") Long id,
                                                       @RequestBody ApplicationUserRequest userRequest) {
@@ -80,6 +81,7 @@ public class ApplicationUserController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @PatchMapping(value = "/users/{id}/avatar")
     public ResponseEntity<ApplicationUser> updateUserAvatar(@RequestParam(value = "file") MultipartFile file,
                                                             @PathVariable(value = "id") Long id) {
