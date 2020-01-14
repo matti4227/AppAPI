@@ -85,12 +85,13 @@ public class RecipeService implements RecipeServiceInterface {
     }
 
     @Override
-    public RecipePageResponse getRecipesByParameters(List<IngredientRequest> ingredientRequestList, String categoryName, int difficulty, int preparationTime, int sort, int page) {
+    public RecipePageResponse getRecipesByParameters(String search, List<IngredientRequest> ingredientRequestList, String categoryName, int difficulty, int preparationTime, int sort, int page) {
         RecipeCategory recipeCategory = getCategoryFromParameter(categoryName);
         Specification<Recipe> spec = Specification
                 .where(new RecipeWithDifficulty(difficulty))
                 .and(new RecipeWithPreparationTime(preparationTime)
-                .and(new RecipeWithRecipeCategory(recipeCategory)));
+                .and(new RecipeWithRecipeCategory(recipeCategory))
+                .and(new RecipeWithNameSearch(search)));
 
         if (ingredientRequestList.size() > 0) {
             List<Ingredient> ingredients = ingredientService.getIngredients(ingredientRequestList);
@@ -101,11 +102,11 @@ public class RecipeService implements RecipeServiceInterface {
         }
 
         Sort s = getSortFromParameter(sort);
-        Pageable pageRequest = PageRequest.of(page, 3, s);
+        Pageable pageRequest = PageRequest.of(page, 12, s);
 
         Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, pageRequest);
 
-        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages());
+        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
     }
 
     @Override
@@ -117,8 +118,8 @@ public class RecipeService implements RecipeServiceInterface {
     public RecipePageResponse getRecipesByNameSearch(String name, int page) {
         Specification<Recipe> spec = Specification.where(new RecipeWithNameSearch(name));
 
-        Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, PageRequest.of(page, 3));
-        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages());
+        Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, PageRequest.of(page, 12));
+        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
     }
 
     @Override
@@ -132,10 +133,10 @@ public class RecipeService implements RecipeServiceInterface {
             }
         }
 
-        Pageable pageRequest = PageRequest.of(page, 3);
+        Pageable pageRequest = PageRequest.of(page, 12);
         Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, pageRequest);
 
-        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages());
+        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
     }
 
     @Override

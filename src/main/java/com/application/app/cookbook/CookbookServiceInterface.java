@@ -13,4 +13,8 @@ public interface CookbookServiceInterface {
     Cookbook addRecipe(Long recipeId, Long cookbookId);
 
     Cookbook removeRecipe(Long recipeId, Long cookbookId);//List<Long>
+
+    Cookbook getCookbookByUser();
+
+    Cookbook removeRecipeFromCookbook(Long recipeId);
 }

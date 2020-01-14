@@ -13,7 +13,9 @@ public interface FridgeServiceInterface {
 
     Fridge getFridge(Long fridgeId);
 
-    Fridge updateFridge(Long fridgeId, List<IngredientRequest> ingredientRequests);
+    Fridge getFridgeByUser();
+
+    Fridge updateFridge(List<IngredientRequest> ingredientRequests);
 
     Fridge addIngredients(Fridge fridge, List<Ingredient> ingredients);
 

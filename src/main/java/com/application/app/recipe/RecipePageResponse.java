@@ -13,4 +13,5 @@ public class RecipePageResponse {
     private List<Recipe> content;
     private int currentPage;
     private int totalPages;
+    private int totalResults;
 }

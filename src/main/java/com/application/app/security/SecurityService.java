@@ -68,7 +68,8 @@ public class SecurityService implements SecurityServiceInterface {
         return compare(user.getUsername(), getUsernameFromUserDetails());
     }
 
-    private String getUsernameFromUserDetails() {
+    @Override
+    public String getUsernameFromUserDetails() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = ((UserDetails)auth.getPrincipal()).getUsername();
         return username;

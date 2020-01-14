@@ -24,7 +24,7 @@ public class IngredientController {
     @PostMapping(value = "")
     public ResponseEntity<Ingredient> addIngredient(@RequestBody IngredientRequest ingredientRequest) {
         try {
-            Ingredient response = ingredientService.addIngredient(ingredientRequest.getIngredientName());
+            Ingredient response = ingredientService.addIngredient(ingredientRequest.getName());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -5,6 +5,7 @@ import com.application.app.applicationUser.ApplicationUserService;
 import com.application.app.ingredient.Ingredient;
 import com.application.app.ingredient.IngredientRequest;
 import com.application.app.ingredient.IngredientService;
+import com.application.app.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,9 @@ public class FridgeService implements FridgeServiceInterface {
     @Autowired
     private FridgeRepository fridgeRepository;
 
+    @Autowired
+    private SecurityService securityService;
+
     @Override
     public void createFridge(Long id) {
         ApplicationUser user = userService.getUser(id);
@@ -39,8 +43,16 @@ public class FridgeService implements FridgeServiceInterface {
     }
 
     @Override
-    public Fridge updateFridge(Long fridgeId, List<IngredientRequest> ingredientRequests) {
-        Fridge fridge = getFridge(fridgeId);
+    public Fridge getFridgeByUser() {
+        String username = securityService.getUsernameFromUserDetails();
+        ApplicationUser user = userService.getUserByName(username);
+
+        return fridgeRepositoryInterface.findFridgeByUser(user);
+    }
+
+    @Override
+    public Fridge updateFridge(List<IngredientRequest> ingredientRequests) {
+        Fridge fridge = getFridgeByUser();
 
         if (fridge.getIngredients().size() > 0) {
             removeIngredients(fridge);

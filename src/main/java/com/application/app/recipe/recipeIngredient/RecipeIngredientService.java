@@ -25,7 +25,7 @@ public class RecipeIngredientService implements RecipeIngredientServiceInterface
 
         for (int x = 0; x < ingredientRequests.size(); x++) {
             recipeIngredient = recipeIngredientRepository.createRecipeIngredient(
-                    recipe, ingredientRequests.get(x).getIngredientName(), ingredientRequests.get(x).getAmount());
+                    recipe, ingredientRequests.get(x).getName(), ingredientRequests.get(x).getAmount());
             recipeIngredientRepositoryInterface.save(recipeIngredient);
             recipeIngredients.add(recipeIngredient);
         }

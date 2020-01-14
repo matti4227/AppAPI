@@ -16,18 +16,11 @@ public class CookbookController {
     @Autowired
     private CookbookService cookbookService;
 
-    @Autowired
-    private SecurityService securityService;
-
     @GetMapping(value = "")
-    public ResponseEntity<Cookbook> getCookbook(@RequestBody CookbookRequest cookbook) {
+    public ResponseEntity<Cookbook> getCookbook() {
         try {
-            if (securityService.isSecuredGetCookbook(cookbook.getCookbookId()) == true) {
-                Cookbook response = cookbookService.getCookbook(cookbook.getCookbookId());
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                throw new Exception();
-            }
+            Cookbook response = cookbookService.getCookbookByUser();
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -46,12 +39,8 @@ public class CookbookController {
     @DeleteMapping(value = "")
     public ResponseEntity<Cookbook> removeRecipe(@RequestBody CookbookRecipeRequest cookbookRecipeRequest ) {
         try {
-            if (securityService.isSecuredRemoveRecipeFromCookbook(cookbookRecipeRequest.getCookbookId()) == true) {
-                Cookbook response = cookbookService.removeRecipe(cookbookRecipeRequest.getRecipeId(), cookbookRecipeRequest.getCookbookId());
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                throw new Exception();
-            }
+            Cookbook response = cookbookService.removeRecipeFromCookbook(cookbookRecipeRequest.getRecipeId());
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

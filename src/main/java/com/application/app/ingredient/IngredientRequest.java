@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class IngredientRequest {
     private Long id;
-    private String ingredientName;
+    private String name;
     private String amount;
 }

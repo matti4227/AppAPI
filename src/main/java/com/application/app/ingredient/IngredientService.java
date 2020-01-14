@@ -30,7 +30,7 @@ public class IngredientService implements IngredientServiceInterface {
         Ingredient ingredient;
 
         for (int x = 0; x < ingredientRequests.size(); x++) {
-            ingredient = getIngredient(ingredientRequests.get(x).getIngredientName());
+            ingredient = getIngredient(ingredientRequests.get(x).getName());
             ingredients.add(ingredient);
         }
 

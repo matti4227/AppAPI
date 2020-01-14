@@ -5,6 +5,7 @@ import com.application.app.applicationUser.ApplicationUserService;
 import com.application.app.recipe.Recipe;
 import com.application.app.recipe.RecipeRepositoryInterface;
 import com.application.app.recipe.RecipeService;
+import com.application.app.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,9 @@ public class CookbookService implements CookbookServiceInterface {
 
     @Autowired
     private RecipeService recipeService;
+
+    @Autowired
+    private SecurityService securityService;
 
     @Override
     public void createCookbook(Long id) {
@@ -62,6 +66,24 @@ public class CookbookService implements CookbookServiceInterface {
 
         Recipe recipe = getRecipeFromCookbook(recipeId);
         Cookbook cookbook = getCookbook(cookbookId);
+
+        cookbook = cookbookRepository.removeRecipe(cookbook, recipe);
+
+        return cookbookRepositoryInterface.save(cookbook);
+    }
+
+    @Override
+    public Cookbook getCookbookByUser() {
+        String username = securityService.getUsernameFromUserDetails();
+        ApplicationUser user = userService.getUserByName(username);
+
+        return cookbookRepositoryInterface.findCookbookByUser(user);
+    }
+
+    @Override
+    public Cookbook removeRecipeFromCookbook(Long recipeId) {
+        Recipe recipe = getRecipeFromCookbook(recipeId);
+        Cookbook cookbook = getCookbookByUser();
 
         cookbook = cookbookRepository.removeRecipe(cookbook, recipe);
 

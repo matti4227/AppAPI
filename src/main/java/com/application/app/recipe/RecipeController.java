@@ -44,16 +44,18 @@ public class RecipeController {
         }
     }
 
-    @GetMapping(value = "")
+    @PostMapping(value = "")
     public ResponseEntity<RecipePageResponse> getRecipesByParameters(
             @RequestBody List<IngredientRequest> ingredientRequestList,
+            @RequestParam(value = "text", defaultValue = "") String text,
             @RequestParam(value = "category", defaultValue = "") String categoryName,
             @RequestParam(value = "diff", defaultValue = "0") int difficulty,
             @RequestParam(value = "prepTime", defaultValue = "0") int preparationTime,
             @RequestParam(value = "sort", defaultValue = "0") int sort,
             @RequestParam(value = "page", defaultValue = "0") int page) {
         try {
-            RecipePageResponse response = recipeService.getRecipesByParameters(ingredientRequestList, categoryName, difficulty, preparationTime, sort, page);
+            RecipePageResponse response = recipeService.getRecipesByParameters(
+                    text, ingredientRequestList, categoryName, difficulty, preparationTime, sort, page);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

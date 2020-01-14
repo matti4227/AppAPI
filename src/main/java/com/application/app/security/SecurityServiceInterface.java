@@ -18,4 +18,6 @@ public interface SecurityServiceInterface {
     Boolean isSecuredDeleteRecipe(Long recipeId);
 
     Boolean isSecuredAddRecipeToCookbook(Long cookbookId);
+
+    String getUsernameFromUserDetails();
 }

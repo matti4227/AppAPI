@@ -1,11 +1,14 @@
 package com.application.app.fridge;
 
+import com.application.app.ingredient.IngredientRequest;
 import com.application.app.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
 @RestController
@@ -15,33 +18,21 @@ public class FridgeController {
     @Autowired
     private FridgeService fridgeService;
 
-    @Autowired
-    private SecurityService securityService;
-
     @GetMapping(value = "")
-    public ResponseEntity<Fridge> getFridge(@RequestBody FridgeRequest fridgeRequest) {
+    public ResponseEntity<Fridge> getFridge() {
         try {
-            if (securityService.isSecuredGetFridge(fridgeRequest.getFridgeId()) == true) {
-                Fridge response = fridgeService.getFridge(fridgeRequest.getFridgeId());
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                throw new Exception();
-            }
+            Fridge response = fridgeService.getFridgeByUser();
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping(value = "")
-    public ResponseEntity<Fridge> updateFridge(@RequestBody FridgeIngredientRequest fridgeIngredientRequest) {
+    public ResponseEntity<Fridge> updateFridge(@RequestBody List<IngredientRequest> ingredientRequestList) {
         try {
-            if (securityService.isSecuredUpdateFridge(fridgeIngredientRequest.getFridgeId()) == true) {
-                Fridge response = fridgeService.updateFridge(fridgeIngredientRequest.getFridgeId(),
-                        fridgeIngredientRequest.getIngredientRequests());
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                throw new Exception();
-            }
+            Fridge response = fridgeService.updateFridge(ingredientRequestList);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
