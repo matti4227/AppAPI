@@ -15,7 +15,9 @@ import com.application.app.recipe.vote.RecipeVoteRequest;
 import com.application.app.recipe.vote.Vote;
 import com.application.app.recipe.vote.VoteService;
 import com.application.app.recipeCategory.RecipeCategory;
+import com.application.app.recipeCategory.RecipeCategoryResponse;
 import com.application.app.recipeCategory.RecipeCategoryService;
+import com.application.app.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -57,16 +60,19 @@ public class RecipeService implements RecipeServiceInterface {
     @Autowired
     private CommentService commentService;
 
+    @Autowired
+    private SecurityService securityService;
+
     @Override
     public Recipe createRecipe(RecipeRequest recipeRequest) {
-        ApplicationUser user = userService.getUser(recipeRequest.getUserId());
+        ApplicationUser user = userService.getUser();
         Recipe recipe = recipeRepository.createRecipe(recipeRequest, user);
 
         recipe = recipeRepositoryInterface.save(recipe);
 
-        if (recipeRequest.getIngredients().size() > 0) {
-            List<Ingredient> ingredients = ingredientService.getIngredients(recipeRequest.getIngredients());
-            addIngredients(recipe, ingredients, recipeRequest.getIngredients());
+        if (recipeRequest.getRecipeIngredients().size() > 0) {
+            List<Ingredient> ingredients = ingredientService.getIngredients(recipeRequest.getRecipeIngredients());
+            addIngredients(recipe, ingredients, recipeRequest.getRecipeIngredients());
         }
 
         recipe = recipeRepositoryInterface.save(recipe);
@@ -82,6 +88,30 @@ public class RecipeService implements RecipeServiceInterface {
     @Override
     public Recipe getRecipe(Long id) {
         return recipeRepositoryInterface.findById(id).orElse(null);
+    }
+
+    public RecipeResponse getSingleRecipe(Long id) {
+        Recipe recipe = getRecipe(id);
+        List<RecipeCategory> categories = categoryService.getCategoriesByRecipe(recipe);
+        List<RecipeCategoryResponse> categoriesNames = new ArrayList<>();
+        for (int x = 0; x < categories.size(); x++) {
+            categoriesNames.add(new RecipeCategoryResponse(categories.get(x).getName()));
+        }
+        return new RecipeResponse(
+                recipe.getId(),
+                recipe.getName(),
+                recipe.getDescription(),
+                recipe.getPreparation(),
+                recipe.getPreparationTime(),
+                recipe.getDifficulty(),
+                recipe.getRating(),
+                recipe.getComments(),
+                recipe.getCreatedDate(),
+                recipe.getUsername(),
+                recipe.getPicture(),
+                recipe.getRecipeIngredients(),
+                categoriesNames
+        );
     }
 
     @Override
@@ -156,19 +186,18 @@ public class RecipeService implements RecipeServiceInterface {
 
         recipe = recipeRepositoryInterface.save(recipe);
 
-        if (recipeRequest.getIngredients().size() > 0) {
-            removeIngredients(recipe);
-            List<Ingredient> ingredients = ingredientService.getIngredients(recipeRequest.getIngredients());
-            addIngredients(recipe, ingredients, recipeRequest.getIngredients());
-        }
+
+        removeIngredients(recipe);
+        List<Ingredient> ingredients = ingredientService.getIngredients(recipeRequest.getRecipeIngredients());
+        addIngredients(recipe, ingredients, recipeRequest.getRecipeIngredients());
+
 
         recipe = recipeRepositoryInterface.save(recipe);
 
-        if (recipeRequest.getCategories().size() > 0) {
-            List<RecipeCategory> categories = categoryService.getCategories(recipeRequest.getCategories());
-            removeRecipeFromCategories(recipe);
-            addRecipeToCategories(recipe, categories);
-        }
+
+        List<RecipeCategory> categories = categoryService.getCategories(recipeRequest.getCategories());
+        removeRecipeFromCategories(recipe);
+        addRecipeToCategories(recipe, categories);
 
         return recipeRepositoryInterface.save(recipe);
     }
@@ -228,7 +257,7 @@ public class RecipeService implements RecipeServiceInterface {
     @Override
     public void addScoreToRecipe(Long recipeId, RecipeVoteRequest recipeVoteRequest) throws Exception {
         Recipe recipe = getRecipe(recipeId);
-        ApplicationUser user = userService.getUser(recipeVoteRequest.getUserId());
+        ApplicationUser user = userService.getUser();
 
         List<Vote> votes = voteService.getVotesByRecipe(recipe);
         Boolean alreadyVoted = userAlreadyVoted(user.getId(), votes);
@@ -267,7 +296,8 @@ public class RecipeService implements RecipeServiceInterface {
     @Override
     public void addCommentToRecipe(Long recipeId, RecipeCommentRequest recipeCommentRequest) {
         Recipe recipe = getRecipe(recipeId);
-        ApplicationUser user = userService.getUser(recipeCommentRequest.getUserId());
+        String username = securityService.getUsernameFromUserDetails();
+        ApplicationUser user = userService.getUserByName(username);
 
         commentService.createComment(recipe, user, recipeCommentRequest.getComment());
     }

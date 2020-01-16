@@ -23,6 +23,7 @@ public class RecipeRepository {
         recipe.setPreparation(recipeRequest.getPreparation());
         recipe.setDifficulty(recipeRequest.getDifficulty());
         recipe.setPreparationTime(recipeRequest.getPreparationTime());
+        recipe.setUsername(user.getUsername());
         recipe.setUser(user);
 
         return recipe;

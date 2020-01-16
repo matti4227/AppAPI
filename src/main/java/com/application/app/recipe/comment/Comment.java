@@ -30,6 +30,11 @@ public class Comment {
     @CreationTimestamp
     private Timestamp createdDate;
 
+    @NotBlank
+    @Size(min=3, max = 24)
+    @Column(updatable = false)
+    private String username;
+
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn

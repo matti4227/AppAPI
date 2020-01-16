@@ -31,7 +31,7 @@ public class FridgeService implements FridgeServiceInterface {
 
     @Override
     public void createFridge(Long id) {
-        ApplicationUser user = userService.getUser(id);
+        ApplicationUser user = userService.getUserById(id);
         Fridge fridge = new Fridge();
         fridge.setUser(user);
         fridgeRepositoryInterface.save(fridge);

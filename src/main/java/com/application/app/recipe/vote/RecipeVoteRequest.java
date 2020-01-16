@@ -7,5 +7,4 @@ import lombok.Setter;
 @Setter
 public class RecipeVoteRequest {
     private int score;
-    private Long userId;
 }

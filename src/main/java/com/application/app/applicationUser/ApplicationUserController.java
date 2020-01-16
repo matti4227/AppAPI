@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,10 +44,10 @@ public class ApplicationUserController {
         }
     }
 
-    @GetMapping(value = "/users/{id}")
-    public ResponseEntity<ApplicationUserResponse> getUser(@PathVariable(value = "id") Long id) {
+    @GetMapping(value = "/user")
+    public ResponseEntity<ApplicationUserResponse> getUser() {
         try {
-            ApplicationUser user = userService.getUser(id);
+            ApplicationUser user = userService.getUser();
             ApplicationUserResponse response = userService.getResponseUser(user);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
@@ -66,32 +67,22 @@ public class ApplicationUserController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    @PatchMapping(value = "/users/{id}/edit")
-    public ResponseEntity<ApplicationUser> updateUser(@PathVariable(value = "id") Long id,
-                                                      @RequestBody ApplicationUserRequest userRequest) {
+    @PatchMapping(value = "/user/edit")
+    public ResponseEntity<ApplicationUser> updateUser(@RequestBody ApplicationUserRequest userRequest) {
         try {
-            if (securityService.isSecuredUpdateUser(id) == true) {
-                ApplicationUser response = userService.updateUser(id, userRequest);
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                throw new Exception();
-            }
+            ApplicationUser response = userService.updateUser(userRequest);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    @PatchMapping(value = "/users/{id}/avatar")
-    public ResponseEntity<ApplicationUser> updateUserAvatar(@RequestParam(value = "file") MultipartFile file,
-                                                            @PathVariable(value = "id") Long id) {
+    @PostMapping(value = "/user/avatar", consumes = "multipart/form-data")
+    public ResponseEntity<ApplicationUser> updateUserAvatar(@RequestParam(value = "file") MultipartFile file) {
         try {
-            if (securityService.isSecuredUpdateUserAvatar(id) == true) {
-                ApplicationUser response = userService.updateUserAvatar(id, file.getBytes());
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else {
-                throw new Exception();
-            }
+            ApplicationUser response = userService.updateUserAvatar(file.getBytes());
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

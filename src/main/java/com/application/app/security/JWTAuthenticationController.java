@@ -37,8 +37,7 @@ public class JWTAuthenticationController {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String token = jwtTokenUtil.generateToken(userDetails);
 
-        Long id = applicationUserService.getUserByName(userDetails.getUsername()).getId();
-        AuthenticationResponse response = new AuthenticationResponse(id, userDetails.getUsername(), token, userDetails.getAuthorities().toString());
+        AuthenticationResponse response = new AuthenticationResponse(userDetails.getUsername(), token, userDetails.getAuthorities().toString());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

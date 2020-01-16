@@ -34,7 +34,7 @@ public class CookbookService implements CookbookServiceInterface {
 
     @Override
     public void createCookbook(Long id) {
-        ApplicationUser user = userService.getUser(id);
+        ApplicationUser user = userService.getUserById(id);
         Cookbook cookbook = new Cookbook();
         cookbook.setUser(user);
         cookbookRepositoryInterface.save(cookbook);

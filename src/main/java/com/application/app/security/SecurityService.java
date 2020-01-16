@@ -16,13 +16,13 @@ public class SecurityService implements SecurityServiceInterface {
 
     @Override
     public Boolean isSecuredUpdateUser(Long userId) {
-        ApplicationUser user = userService.getUser(userId);
+        ApplicationUser user = userService.getUser();
         return compare(user.getUsername(), getUsernameFromUserDetails());
     }
 
     @Override
     public Boolean isSecuredUpdateUserAvatar(Long userId) {
-        ApplicationUser user = userService.getUser(userId);
+        ApplicationUser user = userService.getUser();
         return compare(user.getUsername(), getUsernameFromUserDetails());
     }
 

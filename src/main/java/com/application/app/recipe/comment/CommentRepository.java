@@ -13,6 +13,7 @@ public class CommentRepository {
         comment.setRecipe(recipe);
         comment.setUser(user);
         comment.setComment(recipeComment);
+        comment.setUsername(user.getUsername());
 
         return comment;
     }

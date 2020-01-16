@@ -2,6 +2,7 @@ package com.application.app.applicationUser;
 
 import com.application.app.recipe.Recipe;
 import com.application.app.recipe.RecipeService;
+import com.application.app.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,9 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
     @Autowired
     private RecipeService recipeService;
 
+    @Autowired
+    private SecurityService securityService;
+
     @Override
     public ApplicationUser createUser(ApplicationUserRequest userRequest) {
         userRequest.setPassword(passwordEncoder.encode(userRequest.getPassword()));
@@ -31,8 +35,15 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
     }
 
     @Override
-    public ApplicationUser getUser(Long id) {
+    public ApplicationUser getUserById(Long id) {
         return userRepositoryInterface.findById(id).orElse(null);
+    }
+
+    @Override
+    public ApplicationUser getUser() {
+        String username = securityService.getUsernameFromUserDetails();
+        ApplicationUser user = getUserByName(username);
+        return user;
     }
 
     @Override
@@ -75,14 +86,14 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
     }
 
     @Override
-    public ApplicationUser updateUser(Long id, ApplicationUserRequest userRequest) {
-        ApplicationUser originalUser = getUser(id);
+    public ApplicationUser updateUser(ApplicationUserRequest userRequest) {
+        ApplicationUser originalUser = getUser();
         return userRepository.updateUser(originalUser, userRequest);
     }
 
     @Override
-    public ApplicationUser updateUserAvatar(Long id, byte[] avatar) {
-        ApplicationUser originalUser = getUser(id);
+    public ApplicationUser updateUserAvatar(byte[] avatar) {
+        ApplicationUser originalUser = getUser();
         return userRepository.updateUserAvatar(originalUser, avatar);
     }
 }

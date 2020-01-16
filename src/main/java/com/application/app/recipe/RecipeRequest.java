@@ -16,8 +16,7 @@ public class RecipeRequest {
     private String preparation;
     private int preparationTime;
     private int difficulty;
-    private Long userId;
-    private List<IngredientRequest> ingredients;
+    private List<IngredientRequest> recipeIngredients;
     private List<RecipeCategoryRequest> categories;
 
 }

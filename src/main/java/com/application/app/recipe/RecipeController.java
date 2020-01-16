@@ -35,9 +35,9 @@ public class RecipeController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Recipe> getRecipe(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<RecipeResponse> getRecipe(@PathVariable(value = "id") Long id) {
         try {
-            Recipe response = recipeService.getRecipe(id);
+            RecipeResponse response = recipeService.getSingleRecipe(id);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -87,7 +87,7 @@ public class RecipeController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    @PutMapping(value = "/{id}/edit")
+    @PostMapping(value = "/{id}/edit")
     public ResponseEntity<Recipe> updateRecipe(@PathVariable Long id, @RequestBody RecipeRequest recipeRequest) {
         try {
             if (securityService.isSecuredUpdateRecipe(id) == true) {
@@ -145,7 +145,7 @@ public class RecipeController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    @PutMapping(value = "/{id}")
+    @PostMapping(value = "/{id}/comment")
     public ResponseEntity<Object> commentRecipe(@PathVariable(value = "id") Long recipeId,
                                                 @RequestBody RecipeCommentRequest recipeCommentRequest) {
         try {

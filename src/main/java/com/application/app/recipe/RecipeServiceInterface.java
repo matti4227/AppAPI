@@ -21,6 +21,8 @@ public interface RecipeServiceInterface {
 
     Recipe getRecipe(Long id);
 
+    RecipeResponse getSingleRecipe(Long id);
+
     RecipePageResponse getRecipesByParameters(String search, List<IngredientRequest> ingredientRequestList, String categoryName, int difficulty, int preparationTime, int sort, int page);
 
     RecipePageResponse getRecipesByNameSearch(String name, int page);

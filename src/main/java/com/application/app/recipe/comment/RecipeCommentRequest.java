@@ -7,5 +7,4 @@ import lombok.Setter;
 @Setter
 public class RecipeCommentRequest {
     private String comment;
-    private Long userId;
 }

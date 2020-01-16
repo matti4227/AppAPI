@@ -6,7 +6,9 @@ public interface ApplicationUserServiceInterface {
 
     ApplicationUser createUser(ApplicationUserRequest user);
 
-    ApplicationUser getUser(Long id);
+    ApplicationUser getUserById(Long id);
+
+    ApplicationUser getUser();
 
     ApplicationUser getUserByCookbook(Long id);
 
@@ -20,7 +22,7 @@ public interface ApplicationUserServiceInterface {
 
     List<ApplicationUser> getUsers();
 
-    ApplicationUser updateUser(Long id, ApplicationUserRequest userRequest);
+    ApplicationUser updateUser(ApplicationUserRequest userRequest);
 
-    ApplicationUser updateUserAvatar(Long id, byte[] avatar);
+    ApplicationUser updateUserAvatar(byte[] avatar);
 }

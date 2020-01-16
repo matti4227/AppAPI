@@ -63,6 +63,11 @@ public class Recipe {
     @CreationTimestamp
     private Timestamp createdDate;
 
+    @NotBlank
+    @Size(min=3, max = 24)
+    @Column(updatable = false)
+    private String username;
+
     @Lob
     private byte[] picture;
 
@@ -92,6 +97,10 @@ public class Recipe {
             inverseJoinColumns = @JoinColumn(name = "id_recipe_category")
     )
     private List<RecipeCategory> recipeCategories = new ArrayList<>();
+
+//    @JsonManagedReference
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", fetch = FetchType.LAZY)
+//    private List<RecipeIngredient> recipeCategories = new ArrayList<>();
 
     @JsonManagedReference
     @ManyToMany(mappedBy = "recipes", fetch = FetchType.LAZY)
