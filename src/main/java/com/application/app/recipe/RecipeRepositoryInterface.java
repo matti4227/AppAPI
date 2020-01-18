@@ -1,5 +1,7 @@
 package com.application.app.recipe;
 
+import com.application.app.applicationUser.ApplicationUser;
+import com.application.app.cookbook.Cookbook;
 import com.application.app.ingredient.Ingredient;
 import com.application.app.recipeCategory.RecipeCategory;
 import org.springframework.data.domain.Page;
@@ -19,4 +21,8 @@ public interface RecipeRepositoryInterface extends JpaRepository<Recipe, Long>, 
     Page<Recipe> findAll(Pageable pageable);
 
     List<Recipe> findRecipeByRecipeCategories(RecipeCategory category);
+
+    Page<Recipe> findAllByUser(ApplicationUser user, Pageable pageable);
+
+    Page<Recipe> findAllByCookbooks(Cookbook cookbook, Pageable pageable);
 }

@@ -2,6 +2,7 @@ package com.application.app.recipe;
 
 import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.applicationUser.ApplicationUserService;
+import com.application.app.cookbook.Cookbook;
 import com.application.app.cookbook.CookbookService;
 import com.application.app.ingredient.Ingredient;
 import com.application.app.ingredient.IngredientRequest;
@@ -300,6 +301,21 @@ public class RecipeService implements RecipeServiceInterface {
         ApplicationUser user = userService.getUserByName(username);
 
         commentService.createComment(recipe, user, recipeCommentRequest.getComment());
+    }
+
+    @Override
+    public RecipePageResponse getOwnRecipes(int page) {
+        Pageable pageRequest = PageRequest.of(page, 12);
+        String username = securityService.getUsernameFromUserDetails();
+        ApplicationUser user = userService.getUserByName(username);
+        Page<Recipe> recipePage = recipeRepositoryInterface.findAllByUser(user, pageRequest);
+        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
+    }
+
+    @Override
+    public Page<Recipe> getRecipesByCookbook(Cookbook cookbook, int page) {
+        Pageable pageRequest = PageRequest.of(page, 12);
+        return recipeRepositoryInterface.findAllByCookbooks(cookbook, pageRequest);
     }
 
     private int[] getScores(List<Vote> votes) {

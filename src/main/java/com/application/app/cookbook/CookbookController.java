@@ -1,6 +1,7 @@
 package com.application.app.cookbook;
 
 import com.application.app.recipe.Recipe;
+import com.application.app.recipe.RecipePageResponse;
 import com.application.app.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,9 +18,9 @@ public class CookbookController {
     private CookbookService cookbookService;
 
     @GetMapping(value = "")
-    public ResponseEntity<Cookbook> getCookbook() {
+    public ResponseEntity<RecipePageResponse> getCookbook(@RequestParam(value = "page", defaultValue = "0") int page) {
         try {
-            Cookbook response = cookbookService.getCookbookByUser();
+            RecipePageResponse response = cookbookService.getCookbookByCookbook(page);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

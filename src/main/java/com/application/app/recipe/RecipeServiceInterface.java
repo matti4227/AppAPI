@@ -1,5 +1,6 @@
 package com.application.app.recipe;
 
+import com.application.app.cookbook.Cookbook;
 import com.application.app.ingredient.Ingredient;
 import com.application.app.ingredient.IngredientRequest;
 import com.application.app.recipe.comment.RecipeCommentRequest;
@@ -56,6 +57,10 @@ public interface RecipeServiceInterface {
     Boolean userAlreadyVoted(Long userId, List<Vote> votes);
 
     void addCommentToRecipe(Long recipeId, RecipeCommentRequest recipeCommentRequest);
+
+    RecipePageResponse getOwnRecipes(int page);
+
+    Page<Recipe> getRecipesByCookbook(Cookbook cookbook, int page);
 
 
 //    Ingredient getIngredientFromRecipe(Long recipeId, String ingredientName);

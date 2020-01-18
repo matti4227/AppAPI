@@ -56,6 +56,7 @@ public class Recipe {
     private List<Vote> votes = new ArrayList<>();
 
     @JsonManagedReference
+    @OrderBy(value = "createdDate DESC")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 

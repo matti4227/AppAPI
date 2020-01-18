@@ -3,10 +3,12 @@ package com.application.app.cookbook;
 import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.applicationUser.ApplicationUserService;
 import com.application.app.recipe.Recipe;
+import com.application.app.recipe.RecipePageResponse;
 import com.application.app.recipe.RecipeRepositoryInterface;
 import com.application.app.recipe.RecipeService;
 import com.application.app.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -73,11 +75,22 @@ public class CookbookService implements CookbookServiceInterface {
     }
 
     @Override
+    public RecipePageResponse getCookbookByCookbook(int page) {
+        String username = securityService.getUsernameFromUserDetails();
+        ApplicationUser user = userService.getUserByName(username);
+
+        Cookbook cookbook = cookbookRepositoryInterface.findCookbookByUser(user);
+        Page<Recipe> recipePage = recipeService.getRecipesByCookbook(cookbook, page);
+
+        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
+    }
+
+    @Override
     public Cookbook getCookbookByUser() {
         String username = securityService.getUsernameFromUserDetails();
         ApplicationUser user = userService.getUserByName(username);
 
-        return cookbookRepositoryInterface.findCookbookByUser(user);
+       return cookbookRepositoryInterface.findCookbookByUser(user);
     }
 
     @Override

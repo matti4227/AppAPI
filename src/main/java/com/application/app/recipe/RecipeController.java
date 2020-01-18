@@ -44,6 +44,16 @@ public class RecipeController {
         }
     }
 
+    @GetMapping(value = "")
+    public ResponseEntity<RecipePageResponse> getOwnRecipes(@RequestParam(value = "page", defaultValue = "0") int page) {
+        try {
+            RecipePageResponse response = recipeService.getOwnRecipes(page);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception er) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PostMapping(value = "")
     public ResponseEntity<RecipePageResponse> getRecipesByParameters(
             @RequestBody List<IngredientRequest> ingredientRequestList,

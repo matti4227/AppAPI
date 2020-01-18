@@ -1,6 +1,7 @@
 package com.application.app.cookbook;
 
 import com.application.app.recipe.Recipe;
+import com.application.app.recipe.RecipePageResponse;
 
 public interface CookbookServiceInterface {
 
@@ -13,6 +14,8 @@ public interface CookbookServiceInterface {
     Cookbook addRecipe(Long recipeId, Long cookbookId);
 
     Cookbook removeRecipe(Long recipeId, Long cookbookId);//List<Long>
+
+    RecipePageResponse getCookbookByCookbook(int page);
 
     Cookbook getCookbookByUser();
 
