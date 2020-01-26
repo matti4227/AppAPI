@@ -41,10 +41,10 @@ public class RecipeRepository {
             originalRecipe.setDescription(recipe.getDescription());
         }
         if (recipe.getPreparation() != null) {
-            originalRecipe.setPreparation(recipe.getDescription());
+            originalRecipe.setPreparation(recipe.getPreparation());
         }
         originalRecipe.setDifficulty(recipe.getDifficulty());
-        originalRecipe.setPreparationTime(recipe.getDifficulty());
+        originalRecipe.setPreparationTime(recipe.getPreparationTime());
 
         entityManager.merge(originalRecipe);
         entityManager.getTransaction().commit();
@@ -104,4 +104,31 @@ public class RecipeRepository {
 
         return recipe;
     }
+
+    public Recipe updateRecipeImage(Recipe recipe, byte[] image) {
+
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+
+        recipe.setPicture(image);
+
+        entityManager.merge(recipe);
+        entityManager.getTransaction().commit();
+
+        return recipe;
+    }
+
+//    public ApplicationUser removeUserAvatar(ApplicationUser originalUser) {
+//        EntityManager entityManager = entityManagerFactory.createEntityManager();
+//        entityManager.getTransaction().begin();
+//
+//        if (originalUser.getAvatar() != null) {
+//            originalUser.setAvatar(null);
+//        }
+//
+//        entityManager.merge(originalUser);
+//        entityManager.getTransaction().commit();
+//
+//        return originalUser;
+//    }
 }

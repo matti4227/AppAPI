@@ -8,5 +8,9 @@ import java.util.List;
 public interface VoteServiceInterface {
     Vote createVote(Recipe recipe, ApplicationUser user, int score);
 
+    Vote getVote(Recipe recipe, ApplicationUser user);
+
     List<Vote> getVotesByRecipe(Recipe recipe);
+
+    void updateVote(Recipe recipe, ApplicationUser user, int score);
 }

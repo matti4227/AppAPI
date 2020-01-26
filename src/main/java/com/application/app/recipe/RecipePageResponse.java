@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class RecipePageResponse {
-    private List<Recipe> content;
+    private List<RecipeListResponse> content;
     private int currentPage;
     private int totalPages;
     private int totalResults;

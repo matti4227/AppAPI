@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -34,6 +35,29 @@ public class RecipeController {
         }
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    @PostMapping(value = "/{id}/edit/image", consumes = "multipart/form-data")
+    public ResponseEntity<?> updateRecipeImage(@RequestPart(value = "image") MultipartFile file,
+                                              @PathVariable(value = "id") Long id) {
+        try {
+            recipeService.updateRecipeImage(id, file.getBytes());
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception er) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+//    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+//    @PostMapping(value = "/create/image/remove")
+//    public ResponseEntity<?> removeUserAvatar() {
+//        try {
+//            recipeService.removeRecipeImage();
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        } catch (Exception er) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//    }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<RecipeResponse> getRecipe(@PathVariable(value = "id") Long id) {
         try {
@@ -44,10 +68,12 @@ public class RecipeController {
         }
     }
 
-    @GetMapping(value = "")
-    public ResponseEntity<RecipePageResponse> getOwnRecipes(@RequestParam(value = "page", defaultValue = "0") int page) {
+    @GetMapping(value = "user/{username}")
+    public ResponseEntity<RecipePageResponse> getUserRecipes(@PathVariable(value = "username") String username,
+                                                             @RequestParam(value = "page", defaultValue = "0") int page,
+                                                             @RequestParam(value = "size", defaultValue = "0") int size) {
         try {
-            RecipePageResponse response = recipeService.getOwnRecipes(page);
+            RecipePageResponse response = recipeService.getUserRecipes(username, page, size);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -143,12 +169,12 @@ public class RecipeController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    @PatchMapping(value = "/{id}")
-    public ResponseEntity<Object> rateRecipe(@PathVariable(value = "id") Long recipeId,
+    @PostMapping(value = "/{id}/rate")
+    public ResponseEntity<?> rateRecipe(@PathVariable(value = "id") Long recipeId,
                                              @RequestBody RecipeVoteRequest recipeVoteRequest) {
         try {
             recipeService.addScoreToRecipe(recipeId, recipeVoteRequest);
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -156,11 +182,11 @@ public class RecipeController {
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @PostMapping(value = "/{id}/comment")
-    public ResponseEntity<Object> commentRecipe(@PathVariable(value = "id") Long recipeId,
+    public ResponseEntity<?> commentRecipe(@PathVariable(value = "id") Long recipeId,
                                                 @RequestBody RecipeCommentRequest recipeCommentRequest) {
         try {
             recipeService.addCommentToRecipe(recipeId, recipeCommentRequest);
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            return new ResponseEntity<>( HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

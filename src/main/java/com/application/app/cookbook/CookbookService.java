@@ -2,10 +2,7 @@ package com.application.app.cookbook;
 
 import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.applicationUser.ApplicationUserService;
-import com.application.app.recipe.Recipe;
-import com.application.app.recipe.RecipePageResponse;
-import com.application.app.recipe.RecipeRepositoryInterface;
-import com.application.app.recipe.RecipeService;
+import com.application.app.recipe.*;
 import com.application.app.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -81,8 +78,9 @@ public class CookbookService implements CookbookServiceInterface {
 
         Cookbook cookbook = cookbookRepositoryInterface.findCookbookByUser(user);
         Page<Recipe> recipePage = recipeService.getRecipesByCookbook(cookbook, page);
+        List<RecipeListResponse> recipes = recipeService.getRecipeResponse(recipePage);
 
-        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
+        return new RecipePageResponse(recipes, recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
     }
 
     @Override

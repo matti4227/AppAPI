@@ -22,7 +22,13 @@ public interface ApplicationUserServiceInterface {
 
     List<ApplicationUser> getUsers();
 
-    ApplicationUser updateUser(ApplicationUserRequest userRequest);
+    void updateUserPassword(ApplicationUserEditPasswordRequest userEditPasswordRequest) throws Exception;
 
     ApplicationUser updateUserAvatar(byte[] avatar);
+
+    byte[] getDecompressedAvatar(byte[] avatar);
+
+    ApplicationUser removeUserAvatar();
+
+    void updateUserInfo(ApplicationUserEditInfoRequest userEditInfoRequest);
 }

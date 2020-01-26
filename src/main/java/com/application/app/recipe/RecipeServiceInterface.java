@@ -58,10 +58,15 @@ public interface RecipeServiceInterface {
 
     void addCommentToRecipe(Long recipeId, RecipeCommentRequest recipeCommentRequest);
 
-    RecipePageResponse getOwnRecipes(int page);
+    RecipePageResponse getUserRecipes(String username, int page, int size);
 
     Page<Recipe> getRecipesByCookbook(Cookbook cookbook, int page);
 
+    void updateRecipeImage(Long id, byte[] bytes);
+
+    void removeRecipeImage();
+
+    List<RecipeListResponse> getRecipeResponse(Page<Recipe> recipePage);
 
 //    Ingredient getIngredientFromRecipe(Long recipeId, String ingredientName);
 }

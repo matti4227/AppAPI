@@ -1,5 +1,6 @@
 package com.application.app.applicationUser;
 
+import com.application.app.image.ImageCompDecomp;
 import com.application.app.recipe.Recipe;
 import com.application.app.recipe.RecipeService;
 import com.application.app.security.SecurityService;
@@ -26,6 +27,9 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
 
     @Autowired
     private SecurityService securityService;
+
+    @Autowired
+    private ImageCompDecomp imageCompDecomp;
 
     @Override
     public ApplicationUser createUser(ApplicationUserRequest userRequest) {
@@ -65,11 +69,14 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
     @Override
     public ApplicationUserResponse getResponseUser(ApplicationUser user) throws Exception {
         if (user != null) {
+            byte[] decompressedAvatar = getDecompressedAvatar(user.getAvatar());
+
             return new ApplicationUserResponse(
                     user.getEmail(),
                     user.getUsername(),
                     user.getFirstName(),
-                    user.getLastName());
+                    user.getLastName(),
+                    decompressedAvatar);
         } else {
             throw new Exception();
         }
@@ -86,14 +93,42 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
     }
 
     @Override
-    public ApplicationUser updateUser(ApplicationUserRequest userRequest) {
-        ApplicationUser originalUser = getUser();
-        return userRepository.updateUser(originalUser, userRequest);
+    public void updateUserPassword(ApplicationUserEditPasswordRequest userEditPasswordRequest) throws Exception {
+        if (userEditPasswordRequest.getOldPassword() != null && userEditPasswordRequest.getNewPassword() != null) {
+            ApplicationUser originalUser = getUser();
+            if (passwordEncoder.matches(userEditPasswordRequest.getOldPassword(), originalUser.getPassword())) {
+                userRepository.updateUserPassword(originalUser, userEditPasswordRequest.getNewPassword());
+            } else {
+                throw new Exception();
+            }
+        }
     }
 
     @Override
     public ApplicationUser updateUserAvatar(byte[] avatar) {
         ApplicationUser originalUser = getUser();
-        return userRepository.updateUserAvatar(originalUser, avatar);
+        byte[] compressedAvatar = imageCompDecomp.compressBytes(avatar);
+        return userRepository.updateUserAvatar(originalUser, compressedAvatar);
+    }
+
+    @Override
+    public ApplicationUser removeUserAvatar() {
+        ApplicationUser originalUser = getUser();
+        return userRepository.removeUserAvatar(originalUser);
+    }
+
+    @Override
+    public void updateUserInfo(ApplicationUserEditInfoRequest userEditInfoRequest) {
+        ApplicationUser originalUser = getUser();
+        userRepository.updateUserInfo(originalUser, userEditInfoRequest);
+    }
+
+    @Override
+    public byte[] getDecompressedAvatar(byte[] avatar) {
+        if (avatar != null) {
+            return imageCompDecomp.decompressBytes(avatar);
+        } else {
+            return null;
+        }
     }
 }

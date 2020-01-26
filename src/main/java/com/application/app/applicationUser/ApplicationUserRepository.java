@@ -25,23 +25,12 @@ public class ApplicationUserRepository {
         return user;
     }
 
-    public ApplicationUser updateUser(ApplicationUser originalUser, ApplicationUserRequest userRequest) {
+    public ApplicationUser updateUserPassword(ApplicationUser originalUser, String newPassword) {
 
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
 
-        if (userRequest.getPassword() != null) {
-            originalUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-        }
-        if (userRequest.getEmail() != null) {
-            originalUser.setEmail(userRequest.getEmail());
-        }
-        if (userRequest.getFirstName() != null) {
-            originalUser.setFirstName(userRequest.getFirstName());
-        }
-        if (userRequest.getLastName() != null) {
-            originalUser.setLastName(userRequest.getLastName());
-        }
+        originalUser.setPassword(passwordEncoder.encode(newPassword));
 
         entityManager.merge(originalUser);
         entityManager.getTransaction().commit();
@@ -62,5 +51,35 @@ public class ApplicationUserRepository {
         entityManager.getTransaction().commit();
 
         return originalUser;
+    }
+
+    public ApplicationUser removeUserAvatar(ApplicationUser originalUser) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+
+        if (originalUser.getAvatar() != null) {
+            originalUser.setAvatar(null);
+        }
+
+        entityManager.merge(originalUser);
+        entityManager.getTransaction().commit();
+
+        return originalUser;
+    }
+
+    public void updateUserInfo(ApplicationUser originalUser, ApplicationUserEditInfoRequest userEditInfoRequest) {
+
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+
+        if (userEditInfoRequest.getFirstName() != null) {
+            originalUser.setFirstName(userEditInfoRequest.getFirstName());
+        }
+        if (userEditInfoRequest.getLastName() != null) {
+            originalUser.setLastName(userEditInfoRequest.getLastName());
+        }
+
+        entityManager.merge(originalUser);
+        entityManager.getTransaction().commit();
     }
 }

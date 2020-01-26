@@ -23,7 +23,18 @@ public class VoteService implements VoteServiceInterface {
     }
 
     @Override
+    public Vote getVote(Recipe recipe, ApplicationUser user) {
+        return voteRepositoryInterface.findByUserAndRecipe(user, recipe);
+    }
+
+    @Override
     public List<Vote> getVotesByRecipe(Recipe recipe) {
         return voteRepositoryInterface.findAllByRecipe(recipe);
+    }
+
+    @Override
+    public void updateVote(Recipe recipe, ApplicationUser user, int score) {
+        Vote vote = voteRepositoryInterface.findByUserAndRecipe(user, recipe);
+        voteRepository.updateVote(vote, score);
     }
 }

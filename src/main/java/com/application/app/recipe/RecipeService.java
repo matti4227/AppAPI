@@ -4,9 +4,12 @@ import com.application.app.applicationUser.ApplicationUser;
 import com.application.app.applicationUser.ApplicationUserService;
 import com.application.app.cookbook.Cookbook;
 import com.application.app.cookbook.CookbookService;
+import com.application.app.image.ImageCompDecomp;
 import com.application.app.ingredient.Ingredient;
 import com.application.app.ingredient.IngredientRequest;
 import com.application.app.ingredient.IngredientService;
+import com.application.app.recipe.comment.Comment;
+import com.application.app.recipe.comment.CommentResponse;
 import com.application.app.recipe.comment.CommentService;
 import com.application.app.recipe.comment.RecipeCommentRequest;
 import com.application.app.recipe.recipeIngredient.RecipeIngredient;
@@ -64,6 +67,9 @@ public class RecipeService implements RecipeServiceInterface {
     @Autowired
     private SecurityService securityService;
 
+    @Autowired
+    private ImageCompDecomp imageCompDecomp;
+
     @Override
     public Recipe createRecipe(RecipeRequest recipeRequest) {
         ApplicationUser user = userService.getUser();
@@ -91,6 +97,7 @@ public class RecipeService implements RecipeServiceInterface {
         return recipeRepositoryInterface.findById(id).orElse(null);
     }
 
+    @Override
     public RecipeResponse getSingleRecipe(Long id) {
         Recipe recipe = getRecipe(id);
         List<RecipeCategory> categories = categoryService.getCategoriesByRecipe(recipe);
@@ -98,6 +105,16 @@ public class RecipeService implements RecipeServiceInterface {
         for (int x = 0; x < categories.size(); x++) {
             categoriesNames.add(new RecipeCategoryResponse(categories.get(x).getName()));
         }
+
+        byte[] decompressedImage = getDecompressedImage(recipe.getPicture());
+
+        ApplicationUser user = userService.getUserByName(recipe.getUsername());
+        byte[] decompressedAvatar = userService.getDecompressedAvatar(user.getAvatar());
+
+        List<CommentResponse> comments = getCommentsResponse(recipe.getComments());
+
+        Vote vote = voteService.getVote(recipe, user);
+        
         return new RecipeResponse(
                 recipe.getId(),
                 recipe.getName(),
@@ -106,12 +123,14 @@ public class RecipeService implements RecipeServiceInterface {
                 recipe.getPreparationTime(),
                 recipe.getDifficulty(),
                 recipe.getRating(),
-                recipe.getComments(),
+                vote.getScore(),
                 recipe.getCreatedDate(),
                 recipe.getUsername(),
-                recipe.getPicture(),
+                decompressedAvatar,
+                decompressedImage,
                 recipe.getRecipeIngredients(),
-                categoriesNames
+                categoriesNames,
+                comments
         );
     }
 
@@ -136,8 +155,9 @@ public class RecipeService implements RecipeServiceInterface {
         Pageable pageRequest = PageRequest.of(page, 12, s);
 
         Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, pageRequest);
+        List<RecipeListResponse> recipes = getRecipeResponse(recipePage);
 
-        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
+        return new RecipePageResponse(recipes, recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
     }
 
     @Override
@@ -150,7 +170,8 @@ public class RecipeService implements RecipeServiceInterface {
         Specification<Recipe> spec = Specification.where(new RecipeWithNameSearch(name));
 
         Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, PageRequest.of(page, 12));
-        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
+        List<RecipeListResponse> recipes = getRecipeResponse(recipePage);
+        return new RecipePageResponse(recipes, recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
     }
 
     @Override
@@ -167,7 +188,8 @@ public class RecipeService implements RecipeServiceInterface {
         Pageable pageRequest = PageRequest.of(page, 12);
         Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, pageRequest);
 
-        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
+        List<RecipeListResponse> recipes = getRecipeResponse(recipePage);
+        return new RecipePageResponse(recipes, recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
     }
 
     @Override
@@ -256,7 +278,7 @@ public class RecipeService implements RecipeServiceInterface {
     }
 
     @Override
-    public void addScoreToRecipe(Long recipeId, RecipeVoteRequest recipeVoteRequest) throws Exception {
+    public void addScoreToRecipe(Long recipeId, RecipeVoteRequest recipeVoteRequest) {
         Recipe recipe = getRecipe(recipeId);
         ApplicationUser user = userService.getUser();
 
@@ -270,7 +292,11 @@ public class RecipeService implements RecipeServiceInterface {
 
             updateRating(recipe, recipe.getVotes());
         } else {
-            throw new Exception();
+            voteService.updateVote(recipe, user, recipeVoteRequest.getScore());
+
+            recipe = getRecipe(recipeId);
+
+            updateRating(recipe, recipe.getVotes());
         }
     }
 
@@ -304,18 +330,30 @@ public class RecipeService implements RecipeServiceInterface {
     }
 
     @Override
-    public RecipePageResponse getOwnRecipes(int page) {
-        Pageable pageRequest = PageRequest.of(page, 12);
-        String username = securityService.getUsernameFromUserDetails();
+    public RecipePageResponse getUserRecipes(String username, int page, int size) {
+        Pageable pageRequest = PageRequest.of(page, size);
         ApplicationUser user = userService.getUserByName(username);
         Page<Recipe> recipePage = recipeRepositoryInterface.findAllByUser(user, pageRequest);
-        return new RecipePageResponse(recipePage.getContent(), recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
+        List<RecipeListResponse> recipes = getRecipeResponse(recipePage);
+        return new RecipePageResponse(recipes, recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
     }
 
     @Override
     public Page<Recipe> getRecipesByCookbook(Cookbook cookbook, int page) {
         Pageable pageRequest = PageRequest.of(page, 12);
         return recipeRepositoryInterface.findAllByCookbooks(cookbook, pageRequest);
+    }
+
+    @Override
+    public void updateRecipeImage(Long id, byte[] bytes) {
+        Recipe recipe = getRecipe(id);
+        byte[] compressedImage = imageCompDecomp.compressBytes(bytes);
+        recipeRepository.updateRecipeImage(recipe, compressedImage);
+    }
+
+    @Override
+    public void removeRecipeImage() {
+
     }
 
     private int[] getScores(List<Vote> votes) {
@@ -331,5 +369,55 @@ public class RecipeService implements RecipeServiceInterface {
     private float calculateRating(int[] scores) {
         int sum = Arrays.stream(scores).sum();
         return (float) sum / scores.length;
+    }
+
+    private byte[] getDecompressedImage(byte[] image) {
+        if (image != null) {
+            return imageCompDecomp.decompressBytes(image);
+        } else {
+            return null;
+        }
+    }
+
+    private List<CommentResponse> getCommentsResponse(List<Comment> comments) {
+        List<CommentResponse> commentsResponses = new ArrayList<>();
+        byte[] avatar;
+
+        for (int x = 0; x < comments.size(); x++) {
+            avatar = userService.getDecompressedAvatar(comments.get(x).getUser().getAvatar());
+            commentsResponses.add(new CommentResponse(
+                    comments.get(x).getComment(),
+                    comments.get(x).getCreatedDate(),
+                    comments.get(x).getUsername(),
+                    avatar
+            ));
+        }
+
+        return commentsResponses;
+    }
+
+    @Override
+    public List<RecipeListResponse> getRecipeResponse(Page<Recipe> recipePage) {
+
+        List<RecipeListResponse> recipes = new ArrayList<>();
+        Recipe recipe;
+        byte[] decompressedImage;
+
+        for (int x = 0; x < recipePage.getContent().size(); x++) {
+            recipe = recipePage.getContent().get(x);
+            decompressedImage = getDecompressedImage(recipe.getPicture());
+            recipes.add(new RecipeListResponse(
+                    recipe.getId(),
+                    recipe.getName(),
+                    recipe.getDescription(),
+                    recipe.getPreparationTime(),
+                    recipe.getDifficulty(),
+                    recipe.getRating(),
+                    recipe.getCreatedDate(),
+                    decompressedImage
+            ));
+        }
+
+        return recipes;
     }
 }
