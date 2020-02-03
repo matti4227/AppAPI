@@ -62,9 +62,9 @@ public class ApplicationUserController {
     }
 
     @GetMapping(value = "/users")
-    public ResponseEntity<List<ApplicationUser>> getUsers() {
+    public ResponseEntity<ApplicationUserPageResponse> getAllUsers(@RequestParam(value = "page", defaultValue = "0") int page) {
         try {
-            List<ApplicationUser> response = userService.getUsers();
+            ApplicationUserPageResponse response = userService.getAllUsers(page);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -110,6 +110,17 @@ public class ApplicationUserController {
         try {
             ApplicationUser response = userService.removeUserAvatar();
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception er) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping(value = "/user/{username}")
+    public ResponseEntity<?> deleteUser(@PathVariable(value = "username") String username) {
+        try {
+            userService.deleteUserByUsername(username);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

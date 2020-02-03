@@ -27,10 +27,10 @@ public class RecipeCategoryController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<RecipeCategory>> getAllCategories() {
+    @GetMapping(value = "")
+    public ResponseEntity<List<RecipeCategoryWithIdResponse>> getAllCategories() {
         try {
-            List<RecipeCategory> response = recipeCategoryService.getAllCategories();
+            List<RecipeCategoryWithIdResponse> response = recipeCategoryService.getCategories();
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -42,6 +42,17 @@ public class RecipeCategoryController {
         try {
             List<Recipe> response = recipeCategoryService.getRecipesByCategory(recipeCategoryRequest.getName());
             return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception er) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping(value = "/{name}")
+    public ResponseEntity<Object> deleteCategory(@PathVariable(value = "name") String name) {
+        try {
+            recipeCategoryService.deleteIngredient(name);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

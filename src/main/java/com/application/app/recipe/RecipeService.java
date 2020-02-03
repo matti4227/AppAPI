@@ -78,14 +78,14 @@ public class RecipeService implements RecipeServiceInterface {
         recipe = recipeRepositoryInterface.save(recipe);
 
         if (recipeRequest.getRecipeIngredients().size() > 0) {
-            List<Ingredient> ingredients = ingredientService.getIngredients(recipeRequest.getRecipeIngredients());
+            List<Ingredient> ingredients = ingredientService.getIngredientsByIngredientRequests(recipeRequest.getRecipeIngredients());
             addIngredients(recipe, ingredients, recipeRequest.getRecipeIngredients());
         }
 
         recipe = recipeRepositoryInterface.save(recipe);
 
         if (recipeRequest.getCategories().size() > 0) {
-            List<RecipeCategory> categories = categoryService.getCategories(recipeRequest.getCategories());
+            List<RecipeCategory> categories = categoryService.getCategoriesByCategoryRequests(recipeRequest.getCategories());
             addRecipeToCategories(recipe, categories);
         }
         recipe = recipeRepositoryInterface.save(recipe);
@@ -114,6 +114,14 @@ public class RecipeService implements RecipeServiceInterface {
         List<CommentResponse> comments = getCommentsResponse(recipe.getComments());
 
         Vote vote = voteService.getVote(recipe, user);
+        int score;
+        if (vote != null) {
+            score = vote.getScore();
+        } else {
+            score = 0;
+        }
+
+        boolean inCookbook = cookbookService.checkIfRecipeAlreadyInCookbook(recipe);
         
         return new RecipeResponse(
                 recipe.getId(),
@@ -123,14 +131,15 @@ public class RecipeService implements RecipeServiceInterface {
                 recipe.getPreparationTime(),
                 recipe.getDifficulty(),
                 recipe.getRating(),
-                vote.getScore(),
+                score,
                 recipe.getCreatedDate(),
                 recipe.getUsername(),
                 decompressedAvatar,
                 decompressedImage,
                 recipe.getRecipeIngredients(),
                 categoriesNames,
-                comments
+                comments,
+                inCookbook
         );
     }
 
@@ -144,7 +153,7 @@ public class RecipeService implements RecipeServiceInterface {
                 .and(new RecipeWithNameSearch(search)));
 
         if (ingredientRequestList.size() > 0) {
-            List<Ingredient> ingredients = ingredientService.getIngredients(ingredientRequestList);
+            List<Ingredient> ingredients = ingredientService.getIngredientsByIngredientRequests(ingredientRequestList);
 
             for (int x = 0; x < ingredients.size(); x++) {
                 spec = spec.and(new RecipeWithIngredient(ingredients.get(x)));
@@ -176,7 +185,7 @@ public class RecipeService implements RecipeServiceInterface {
 
     @Override
     public RecipePageResponse getRecipesByIngredients(List<IngredientRequest> ingredientRequestList, int page) {
-        List<Ingredient> ingredients = ingredientService.getIngredients(ingredientRequestList);
+        List<Ingredient> ingredients = ingredientService.getIngredientsByIngredientRequests(ingredientRequestList);
         Specification<Recipe> spec = Specification.where(new RecipeWithIngredient(ingredients.get(0)));
 
         if (ingredients.size() > 1) {
@@ -198,8 +207,8 @@ public class RecipeService implements RecipeServiceInterface {
     }
 
     @Override
-    public void addRecipeToCookbook(Long recipeId, Long id) {
-        cookbookService.addRecipe(recipeId, id);
+    public void addRecipeToCookbook(Long recipeId) throws Exception {
+        cookbookService.addRecipe(recipeId);
     }
 
     @Override
@@ -211,14 +220,14 @@ public class RecipeService implements RecipeServiceInterface {
 
 
         removeIngredients(recipe);
-        List<Ingredient> ingredients = ingredientService.getIngredients(recipeRequest.getRecipeIngredients());
+        List<Ingredient> ingredients = ingredientService.getIngredientsByIngredientRequests(recipeRequest.getRecipeIngredients());
         addIngredients(recipe, ingredients, recipeRequest.getRecipeIngredients());
 
 
         recipe = recipeRepositoryInterface.save(recipe);
 
 
-        List<RecipeCategory> categories = categoryService.getCategories(recipeRequest.getCategories());
+        List<RecipeCategory> categories = categoryService.getCategoriesByCategoryRequests(recipeRequest.getCategories());
         removeRecipeFromCategories(recipe);
         addRecipeToCategories(recipe, categories);
 

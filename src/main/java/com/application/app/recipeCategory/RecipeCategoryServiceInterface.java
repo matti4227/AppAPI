@@ -10,7 +10,9 @@ public interface RecipeCategoryServiceInterface {
 
     List<RecipeCategory> getAllCategories();
 
-    List<RecipeCategory> getCategories(List<RecipeCategoryRequest> categoryRequests);
+    List<RecipeCategory> getCategoriesByCategoryRequests(List<RecipeCategoryRequest> categoryRequests);
+
+    List<RecipeCategoryWithIdResponse> getCategories();
 
     List<RecipeCategory> getCategoriesByRecipe(Recipe recipe);
 
@@ -25,4 +27,6 @@ public interface RecipeCategoryServiceInterface {
     void removeRecipeFromCategories(Long recipeId);//List<Long>
 
     Recipe getRecipeFromRecipeCategory(String categoryName, Long recipeId);
+
+    void deleteIngredient(String name);
 }

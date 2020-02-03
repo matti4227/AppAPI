@@ -10,4 +10,6 @@ public interface RecipeCategoryRepositoryInterface extends JpaRepository<RecipeC
     RecipeCategory findByName(String name);
 
     List<RecipeCategory> findRecipeCategoriesByRecipes(Recipe recipe);
+
+    List<RecipeCategory> findAllByOrderByName();
 }

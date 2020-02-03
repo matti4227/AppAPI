@@ -36,7 +36,7 @@ public interface RecipeServiceInterface {
 
     void deleteRecipe(Long id);
 
-    void addRecipeToCookbook(Long recipeId, Long id);
+    void addRecipeToCookbook(Long recipeId) throws Exception;
 
     void addRecipeToCategories(Recipe recipe, List<RecipeCategory> categories);
 

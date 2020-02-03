@@ -1,6 +1,8 @@
 package com.application.app.applicationUser;
 
 import com.application.app.recipe.Recipe;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +19,8 @@ public interface ApplicationUserRepositoryInterface extends JpaRepository<Applic
     ApplicationUser findByFridgeId(Long id);
 
     ApplicationUser findByRecipes(Recipe recipe);
+
+    Page<ApplicationUser> findAll(Pageable pageable);
+
+    void deleteByUsername(String username);
 }

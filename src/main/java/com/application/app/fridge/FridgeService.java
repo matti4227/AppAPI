@@ -59,7 +59,7 @@ public class FridgeService implements FridgeServiceInterface {
         }
 
         if (ingredientRequests.size() > 0) {
-            List<Ingredient> ingredients = ingredientService.getIngredients(ingredientRequests);
+            List<Ingredient> ingredients = ingredientService.getIngredientsByIngredientRequests(ingredientRequests);
             fridge = addIngredients(fridge, ingredients);
         }
 

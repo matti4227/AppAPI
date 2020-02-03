@@ -11,13 +11,13 @@ public interface CookbookServiceInterface {
 
     Recipe getRecipeFromCookbook(Long recipeId);
 
-    Cookbook addRecipe(Long recipeId, Long cookbookId);
-
-    Cookbook removeRecipe(Long recipeId, Long cookbookId);//List<Long>
+    Cookbook addRecipe(Long recipeId) throws Exception;
 
     RecipePageResponse getCookbookByCookbook(int page);
 
     Cookbook getCookbookByUser();
 
     Cookbook removeRecipeFromCookbook(Long recipeId);
+
+    boolean checkIfRecipeAlreadyInCookbook(Recipe recipe);
 }

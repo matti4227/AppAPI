@@ -37,10 +37,10 @@ public class CookbookController {
         }
     }
 
-    @DeleteMapping(value = "")
-    public ResponseEntity<Cookbook> removeRecipe(@RequestBody CookbookRecipeRequest cookbookRecipeRequest ) {
+    @DeleteMapping(value = "/{recipeId}")
+    public ResponseEntity<Cookbook> removeRecipe(@PathVariable Long recipeId) {
         try {
-            Cookbook response = cookbookService.removeRecipeFromCookbook(cookbookRecipeRequest.getRecipeId());
+            Cookbook response = cookbookService.removeRecipeFromCookbook(recipeId);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

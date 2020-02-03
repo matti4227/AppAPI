@@ -28,11 +28,23 @@ public class RecipeCategoryService implements RecipeCategoryServiceInterface {
 
     @Override
     public List<RecipeCategory> getAllCategories() {
-        return recipeCategoryRepositoryInterface.findAll();
+        return recipeCategoryRepositoryInterface.findAllByOrderByName();
     }
 
     @Override
-    public List<RecipeCategory> getCategories(List<RecipeCategoryRequest> categoryRequests) {
+    public List<RecipeCategoryWithIdResponse> getCategories() {
+        List<RecipeCategory> categories = getAllCategories();
+        List<RecipeCategoryWithIdResponse> categoriesResponse = new ArrayList<>();
+
+        for (int x = 0; x < categories.size(); x++) {
+            categoriesResponse.add(new RecipeCategoryWithIdResponse(categories.get(x).getId(), categories.get(x).getName()));
+        }
+
+        return categoriesResponse;
+    }
+
+    @Override
+    public List<RecipeCategory> getCategoriesByCategoryRequests(List<RecipeCategoryRequest> categoryRequests) {
         List<RecipeCategory> categories = new ArrayList<>();
         RecipeCategory category;
 
@@ -98,5 +110,11 @@ public class RecipeCategoryService implements RecipeCategoryServiceInterface {
             }
         }
         return recipe;
+    }
+
+    @Override
+    public void deleteIngredient(String name) {
+        RecipeCategory category = recipeCategoryRepositoryInterface.findByName(name);
+        recipeCategoryRepositoryInterface.delete(category);
     }
 }

@@ -30,4 +30,5 @@ public class RecipeResponse {
     private List<RecipeIngredient> recipeIngredients;
     private List<RecipeCategoryResponse> categories;
     private List<CommentResponse> comments;
+    private boolean inCookbook;
 }

@@ -5,9 +5,12 @@ import com.application.app.recipe.Recipe;
 import com.application.app.recipe.RecipeService;
 import com.application.app.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -82,14 +85,38 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
         }
     }
 
+    private ApplicationUserWithIdResponse getResponseUserWithId(ApplicationUser user) throws Exception {
+        if (user != null) {
+            return new ApplicationUserWithIdResponse(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getUsername(),
+                    user.getFirstName(),
+                    user.getLastName());
+        } else {
+            throw new Exception();
+        }
+    }
+
     @Override
     public ApplicationUser getUserByName(String username) {
         return userRepositoryInterface.findByUsername(username);
     }
 
+//    @Override
+//    public List<ApplicationUser> getUsers() {
+//        return userRepositoryInterface.findAll();
+//    }
+
     @Override
-    public List<ApplicationUser> getUsers() {
-        return userRepositoryInterface.findAll();
+    public ApplicationUserPageResponse getAllUsers(int page) throws Exception {
+        Page<ApplicationUser> recipePage = userRepositoryInterface.findAll(PageRequest.of(page, 15));
+
+        List<ApplicationUserWithIdResponse> users = new ArrayList<>();
+        for (int x = 0; x < recipePage.getTotalElements(); x++) {
+            users.add(getResponseUserWithId(recipePage.getContent().get(x)));
+        }
+        return new ApplicationUserPageResponse(users, recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
     }
 
     @Override
@@ -121,6 +148,12 @@ public class ApplicationUserService implements ApplicationUserServiceInterface {
     public void updateUserInfo(ApplicationUserEditInfoRequest userEditInfoRequest) {
         ApplicationUser originalUser = getUser();
         userRepository.updateUserInfo(originalUser, userEditInfoRequest);
+    }
+
+    @Override
+    public void deleteUserByUsername(String username) {
+        ApplicationUser user = getUserByName(username);
+        userRepositoryInterface.delete(user);
     }
 
     @Override

@@ -51,24 +51,17 @@ public class CookbookService implements CookbookServiceInterface {
     }
 
     @Override
-    public Cookbook addRecipe(Long recipeId, Long cookbookId) {
+    public Cookbook addRecipe(Long recipeId) throws Exception {
         Recipe recipe = recipeRepositoryInterface.findById(recipeId).orElse(null);
-        Cookbook cookbook = cookbookRepositoryInterface.findById(cookbookId).orElse(null);
+        Cookbook cookbook = getCookbookByUser();
 
-        cookbook = cookbookRepository.addRecipe(cookbook, recipe);
-        cookbookRepositoryInterface.save(cookbook);
-        return cookbook;
-    }
-
-    @Override
-    public Cookbook removeRecipe(Long recipeId, Long cookbookId) {
-
-        Recipe recipe = getRecipeFromCookbook(recipeId);
-        Cookbook cookbook = getCookbook(cookbookId);
-
-        cookbook = cookbookRepository.removeRecipe(cookbook, recipe);
-
-        return cookbookRepositoryInterface.save(cookbook);
+        if (checkIfRecipeAlreadyInCookbook(recipe) == true) {
+            throw new Exception();
+        } else {
+            cookbook = cookbookRepository.addRecipe(cookbook, recipe);
+            cookbookRepositoryInterface.save(cookbook);
+            return cookbook;
+        }
     }
 
     @Override
@@ -99,6 +92,21 @@ public class CookbookService implements CookbookServiceInterface {
         cookbook = cookbookRepository.removeRecipe(cookbook, recipe);
 
         return cookbookRepositoryInterface.save(cookbook);
+    }
+
+    @Override
+    public boolean checkIfRecipeAlreadyInCookbook(Recipe recipe) {
+        Cookbook cookbook = getCookbookByUser();
+        boolean flag = false;
+
+        for (int x = 0; x < cookbook.getRecipes().size(); x++) {
+            if (cookbook.getRecipes().get(x).getId() == recipe.getId()) {
+                flag = true;
+                break;
+            }
+        }
+
+        return flag;
     }
 
 }

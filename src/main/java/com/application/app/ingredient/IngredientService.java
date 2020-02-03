@@ -1,6 +1,9 @@
 package com.application.app.ingredient;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,11 +24,23 @@ public class IngredientService implements IngredientServiceInterface {
 
     @Override
     public List<Ingredient> getAllIngredients() {
-        return ingredientRepositoryInterface.findAll();
+        return ingredientRepositoryInterface.findAllByOrderByName();
     }
 
     @Override
-    public List<Ingredient> getIngredients(List<IngredientRequest> ingredientRequests) {
+    public List<IngredientResponse> getIngredients() {
+        List<Ingredient> ingredients = getAllIngredients();
+        List<IngredientResponse> ingredientsResponse = new ArrayList<>();
+
+        for (int x = 0; x < ingredients.size(); x++) {
+            ingredientsResponse.add(new IngredientResponse(ingredients.get(x).getName()));
+        }
+
+        return ingredientsResponse;
+    }
+
+    @Override
+    public List<Ingredient> getIngredientsByIngredientRequests(List<IngredientRequest> ingredientRequests) {
         List<Ingredient> ingredients = new ArrayList<>();
         Ingredient ingredient;
 
@@ -37,23 +52,6 @@ public class IngredientService implements IngredientServiceInterface {
         return ingredients;
     }
 
-//    public List<Ingredient> getIngredients(List<RecipeRequest> ingredientNames ) {
-//
-//        Ingredient ingredient;
-//        List<Ingredient> ingredients = new ArrayList<>();
-//
-//        for (int x = 0; x < ingredientNames.size(); x++) {
-//            ingredient = ingredientRepositoryInterface.findByName(ingredientNames.get(x).getName());
-//            ingredients.add(ingredient);
-//        }
-//
-//        return ingredients;
-//    }
-//
-//    private Ingredient getIngredientObject() {
-//        return new Ingredient();
-//    }
-
     @Override
     public Ingredient getIngredient(String ingredientName) {
         return ingredientRepositoryInterface.findByName(ingredientName);
@@ -61,5 +59,13 @@ public class IngredientService implements IngredientServiceInterface {
 
     public void deleteIngredient(Long ingredientId) {
         ingredientRepositoryInterface.deleteById(ingredientId);
+    }
+
+    @Override
+    public IngredientPageResponse getIngredientsPage(int page) {
+        Pageable pageRequest = PageRequest.of(page, 25);
+        Page<Ingredient> ingredientPage = ingredientRepositoryInterface.findAll(pageRequest);
+
+        return new IngredientPageResponse(ingredientPage.getContent(), ingredientPage.getNumber(), ingredientPage.getTotalPages(), (int) ingredientPage.getTotalElements());
     }
 }

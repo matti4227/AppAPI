@@ -110,7 +110,9 @@ public class RecipeRepository {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
 
-        recipe.setPicture(image);
+        if (image != null) {
+            recipe.setPicture(image);
+        }
 
         entityManager.merge(recipe);
         entityManager.getTransaction().commit();

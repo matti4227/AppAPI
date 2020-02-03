@@ -33,9 +33,20 @@ public class IngredientController {
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @GetMapping(value = "")
-    public ResponseEntity<List<Ingredient>> getIngredients() {
+    public ResponseEntity<List<IngredientResponse>> getIngredients() {
         try {
-            List<Ingredient> response = ingredientService.getAllIngredients();
+            List<IngredientResponse> response = ingredientService.getIngredients();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception er) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    @GetMapping(value = "/page")
+    public ResponseEntity<IngredientPageResponse> getIngredientsPage(@RequestParam(value = "page", defaultValue = "0") int page) {
+        try {
+            IngredientPageResponse response = ingredientService.getIngredientsPage(page);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -43,10 +54,10 @@ public class IngredientController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @DeleteMapping(value = "")
-    public ResponseEntity<Object> deleteIngredient(@RequestBody IngredientRequest ingredientRequest) {
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Object> deleteIngredient(@PathVariable(value = "id") Long id) {
         try {
-            ingredientService.deleteIngredient(ingredientRequest.getId());
+            ingredientService.deleteIngredient(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

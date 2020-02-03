@@ -42,11 +42,12 @@ public class Recipe {
     private String preparation;
 
     @Min(1)
+    @Max(3)
     @Column(name = "preparation_time")
     private int preparationTime;
 
     @Min(1)
-    @Max(5)
+    @Max(3)
     private int difficulty;
 
     private float rating;

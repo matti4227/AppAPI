@@ -154,15 +154,10 @@ public class RecipeController {
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     @PostMapping(value = "/{id}")
-    public ResponseEntity<Object> addToCookbook(@PathVariable(value = "id") Long recipeId,
-                                                @RequestBody RecipeCookbookRequest recipeCookbookRequest) {
+    public ResponseEntity<Object> addToCookbook(@PathVariable(value = "id") Long recipeId) {
         try {
-            if (securityService.isSecuredAddRecipeToCookbook(recipeCookbookRequest.getId()) == true) {
-                recipeService.addRecipeToCookbook(recipeId, recipeCookbookRequest.getId());
-                return new ResponseEntity<>(null, HttpStatus.OK);
-            } else {
-                throw new Exception();
-            }
+            recipeService.addRecipeToCookbook(recipeId);
+            return new ResponseEntity<>(null, HttpStatus.OK);
         } catch (Exception er) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

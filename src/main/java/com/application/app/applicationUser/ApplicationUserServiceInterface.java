@@ -18,9 +18,11 @@ public interface ApplicationUserServiceInterface {
 
     ApplicationUserResponse getResponseUser(ApplicationUser user) throws Exception;
 
+    ApplicationUserPageResponse getAllUsers(int page) throws Exception;
+
     ApplicationUser getUserByName(String username);
 
-    List<ApplicationUser> getUsers();
+//    List<ApplicationUser> getUsers();
 
     void updateUserPassword(ApplicationUserEditPasswordRequest userEditPasswordRequest) throws Exception;
 
@@ -31,4 +33,6 @@ public interface ApplicationUserServiceInterface {
     ApplicationUser removeUserAvatar();
 
     void updateUserInfo(ApplicationUserEditInfoRequest userEditInfoRequest);
+
+    void deleteUserByUsername(String username);
 }
