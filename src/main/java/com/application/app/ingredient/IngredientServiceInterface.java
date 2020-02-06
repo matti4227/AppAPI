@@ -15,7 +15,11 @@ public interface IngredientServiceInterface {
 
     List<Ingredient> getIngredientsByIngredientRequests(List<IngredientRequest> ingredientRequests);
 
-    Ingredient getIngredient(String ingredientName);
+    Ingredient getIngredientByName(String ingredientName);
+
+    Ingredient getIngredientById(Long ingredientId);
+
+    void deleteIngredientById(Long ingredientId);
 
     void deleteIngredient(Long ingredientId);
 

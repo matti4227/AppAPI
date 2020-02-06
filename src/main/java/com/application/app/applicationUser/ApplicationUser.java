@@ -37,6 +37,7 @@ public class ApplicationUser {
     @NotBlank
     @Email
     @Size(max = 100)
+    @Column(updatable = false)
     private String email;
 
     @NotBlank
@@ -45,7 +46,6 @@ public class ApplicationUser {
     private String username;
 
     @NotBlank
-//    @Size(min = 6, max = 24)
     private String password;
 
     @Lob

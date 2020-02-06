@@ -1,5 +1,6 @@
 package com.application.app.ingredient;
 
+import com.application.app.recipe.recipeIngredient.RecipeIngredientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +15,9 @@ public class IngredientService implements IngredientServiceInterface {
 
     @Autowired
     private IngredientRepositoryInterface ingredientRepositoryInterface;
+
+    @Autowired
+    private RecipeIngredientService recipeIngredientService;
 
     @Override
     public Ingredient addIngredient(String ingredientName) {
@@ -45,7 +49,7 @@ public class IngredientService implements IngredientServiceInterface {
         Ingredient ingredient;
 
         for (int x = 0; x < ingredientRequests.size(); x++) {
-            ingredient = getIngredient(ingredientRequests.get(x).getName());
+            ingredient = getIngredientByName(ingredientRequests.get(x).getName());
             ingredients.add(ingredient);
         }
 
@@ -53,12 +57,25 @@ public class IngredientService implements IngredientServiceInterface {
     }
 
     @Override
-    public Ingredient getIngredient(String ingredientName) {
+    public Ingredient getIngredientByName(String ingredientName) {
         return ingredientRepositoryInterface.findByName(ingredientName);
     }
 
-    public void deleteIngredient(Long ingredientId) {
+    @Override
+    public Ingredient getIngredientById(Long ingredientId) {
+        return ingredientRepositoryInterface.findById(ingredientId).orElse(null);
+    }
+
+    @Override
+    public void deleteIngredientById(Long ingredientId) {
         ingredientRepositoryInterface.deleteById(ingredientId);
+    }
+
+    @Override
+    public void deleteIngredient(Long ingredientId) {
+        Ingredient ingredient = getIngredientById(ingredientId);
+        recipeIngredientService.deleteRecipeIngredientsByRecipeIngredients(ingredient.getName());
+        deleteIngredientById(ingredientId);
     }
 
     @Override

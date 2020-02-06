@@ -12,4 +12,8 @@ public interface RecipeIngredientServiceInterface {
     List<RecipeIngredient> createRecipeIngredients(Recipe recipe, List<IngredientRequest> ingredientRequest);
 
     void deleteRecipeIngredients(Recipe recipe);
+
+    void deleteRecipeIngredientsByRecipeIngredients(String name);
+
+    List<RecipeIngredient> getRecipeIngredientsByName(String name);
 }

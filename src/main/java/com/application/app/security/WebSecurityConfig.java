@@ -15,8 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.application.app.security.SecurityConstants.AUTHENTICATE_URL;
-import static com.application.app.security.SecurityConstants.SIGN_UP_URL;
+import static com.application.app.security.SecurityConstants.*;
 
 @Configuration
 @EnableWebSecurity
@@ -55,7 +54,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(AUTHENTICATE_URL).permitAll()
                 .antMatchers(SIGN_UP_URL).permitAll()
-                .antMatchers("/recipes").permitAll()
+                .antMatchers(RECIPES).permitAll()
+                .antMatchers(RECIPE_CATEGORIES).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)

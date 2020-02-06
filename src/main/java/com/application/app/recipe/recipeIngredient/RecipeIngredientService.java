@@ -39,6 +39,16 @@ public class RecipeIngredientService implements RecipeIngredientServiceInterface
         for (int x = 0; x < recipeIngredients.size(); x++) {
             recipeIngredientRepositoryInterface.deleteById(recipeIngredients.get(x).getId());
         }
+    }
 
+    @Override
+    public void deleteRecipeIngredientsByRecipeIngredients(String name) {
+        List<RecipeIngredient> ingredients = getRecipeIngredientsByName(name);
+        recipeIngredientRepositoryInterface.deleteAll(ingredients);
+    }
+
+    @Override
+    public List<RecipeIngredient> getRecipeIngredientsByName(String name) {
+       return recipeIngredientRepositoryInterface.getAllByName(name);
     }
 }
