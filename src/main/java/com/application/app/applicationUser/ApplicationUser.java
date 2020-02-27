@@ -12,6 +12,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,17 +35,20 @@ public class ApplicationUser {
     @Column(name = "last_name")
     private String lastName;
 
+    @NotNull
     @NotBlank
     @Email
     @Size(max = 100)
     @Column(updatable = false)
     private String email;
 
+    @NotNull
     @NotBlank
     @Column(unique = true, updatable = false)
     @Size(min = 3, max = 24)
     private String username;
 
+    @NotNull
     @NotBlank
     private String password;
 

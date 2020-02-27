@@ -30,22 +30,27 @@ public class Recipe {
     private Long id;
 
     @NotBlank
+    @NotNull
     @Size(max = 100)
     private String name;
 
     @NotBlank
+    @NotNull
     @Size(max = 1000)
     private String description;
 
     @NotBlank
+    @NotNull
     @Size(max = 10000)
     private String preparation;
 
+    @NotNull
     @Min(1)
     @Max(3)
     @Column(name = "preparation_time")
     private int preparationTime;
 
+    @NotNull
     @Min(1)
     @Max(3)
     private int difficulty;
@@ -69,7 +74,7 @@ public class Recipe {
     @Size(min=3, max = 24)
     @Column(updatable = false)
     private String username;
-
+    
     @Lob
     private byte[] picture;
 
@@ -87,10 +92,6 @@ public class Recipe {
     )
     private List<Cookbook> cookbooks = new ArrayList<>();
 
-//    @JsonManagedReference
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", fetch = FetchType.LAZY)
-//    private List<RecipePicture> recipePictures = new ArrayList<>();
-
     @JsonBackReference
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -99,10 +100,6 @@ public class Recipe {
             inverseJoinColumns = @JoinColumn(name = "id_recipe_category")
     )
     private List<RecipeCategory> recipeCategories = new ArrayList<>();
-
-//    @JsonManagedReference
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe", fetch = FetchType.LAZY)
-//    private List<RecipeIngredient> recipeCategories = new ArrayList<>();
 
     @JsonManagedReference
     @ManyToMany(mappedBy = "recipes", fetch = FetchType.LAZY)

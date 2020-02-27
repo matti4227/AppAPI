@@ -8,7 +8,7 @@ import java.io.Serializable;
 @Getter
 @AllArgsConstructor
 public class AuthenticationResponse implements Serializable {
-    private String userName;
+    private String username;
     private String bearerToken;
     private String role;
 }

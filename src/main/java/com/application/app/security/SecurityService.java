@@ -71,8 +71,12 @@ public class SecurityService implements SecurityServiceInterface {
     @Override
     public String getUsernameFromUserDetails() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = ((UserDetails)auth.getPrincipal()).getUsername();
-        return username;
+        if (auth.getPrincipal() == "anonymousUser") {
+            return null;
+        } else {
+            String username = ((UserDetails)auth.getPrincipal()).getUsername();
+            return username;
+        }
     }
 
     private Boolean compare(String username, String usernameFromUserDetails) {

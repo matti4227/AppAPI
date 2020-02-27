@@ -17,23 +17,6 @@ import static com.application.app.security.SecurityConstants.TOKEN_SECRET;
 @Component
 public class JWTTokenUtil implements Serializable {
 
-//    public String getUsernameFromToken(String token) {
-//        return getClaimFromToken(token, Claims::getSubject);
-//    }
-//
-//    public Date getExpirationDateFromToken(String token) {
-//        return getClaimFromToken(token, Claims::getExpiration);
-//    }
-//
-//    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-//        Claims claims = getAllClaimsFromToken(token);
-//        return claimsResolver.apply(claims);
-//    }
-//
-//    public Date getExpirationDateFromToken(String token) {
-//        return getAllClaimsFromToken(token).getExpiration();
-//    }
-
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
 

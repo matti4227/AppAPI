@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
@@ -22,6 +23,7 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @NotBlank
     @Size(min = 1, max = 1000)
     private String comment;
@@ -30,8 +32,9 @@ public class Comment {
     @CreationTimestamp
     private Timestamp createdDate;
 
+    @NotNull
     @NotBlank
-    @Size(min=3, max = 24)
+    @Size(min = 3, max = 24)
     @Column(updatable = false)
     private String username;
 

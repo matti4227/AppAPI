@@ -27,9 +27,6 @@ public class JWTAuthenticationController {
     @Autowired
     private JWTUserDetailsService userDetailsService;
 
-    @Autowired
-    private ApplicationUserService applicationUserService;
-
     @PostMapping(value = "")
     public ResponseEntity<AuthenticationResponse> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
 

@@ -121,7 +121,13 @@ public class RecipeService implements RecipeServiceInterface {
             score = 0;
         }
 
-        boolean inCookbook = cookbookService.checkIfRecipeAlreadyInCookbook(recipe);
+        boolean inCookbook;
+        if (securityService.getUsernameFromUserDetails() == null) {
+            inCookbook = false;
+        } else {
+            inCookbook = cookbookService.checkIfRecipeAlreadyInCookbook(recipe);
+        }
+
         
         return new RecipeResponse(
                 recipe.getId(),

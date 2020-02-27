@@ -1,6 +1,5 @@
 package com.application.app.recipe;
 
-import com.application.app.cookbook.CookbookService;
 import com.application.app.ingredient.IngredientRequest;
 import com.application.app.recipe.comment.RecipeCommentRequest;
 import com.application.app.recipe.vote.RecipeVoteRequest;
@@ -46,17 +45,6 @@ public class RecipeController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
-//    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-//    @PostMapping(value = "/create/image/remove")
-//    public ResponseEntity<?> removeUserAvatar() {
-//        try {
-//            recipeService.removeRecipeImage();
-//            return new ResponseEntity<>(HttpStatus.OK);
-//        } catch (Exception er) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//    }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<RecipeResponse> getRecipe(@PathVariable(value = "id") Long id) {
