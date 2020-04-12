@@ -113,7 +113,8 @@ public class RecipeService implements RecipeServiceInterface {
 
         List<CommentResponse> comments = getCommentsResponse(recipe.getComments());
 
-        Vote vote = voteService.getVote(recipe, user);
+        ApplicationUser userVote = userService.getUser();
+        Vote vote = voteService.getVote(recipe, userVote);
         int score;
         if (vote != null) {
             score = vote.getScore();
@@ -167,7 +168,7 @@ public class RecipeService implements RecipeServiceInterface {
         }
 
         Sort s = getSortFromParameter(sort);
-        Pageable pageRequest = PageRequest.of(page, 12, s);
+        Pageable pageRequest = PageRequest.of(page, 6, s);
 
         Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, pageRequest);
         List<RecipeListResponse> recipes = getRecipeResponse(recipePage);
@@ -184,7 +185,7 @@ public class RecipeService implements RecipeServiceInterface {
     public RecipePageResponse getRecipesByNameSearch(String name, int page) {
         Specification<Recipe> spec = Specification.where(new RecipeWithNameSearch(name));
 
-        Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, PageRequest.of(page, 12));
+        Page<Recipe> recipePage = recipeRepositoryInterface.findAll(spec, PageRequest.of(page, 6));
         List<RecipeListResponse> recipes = getRecipeResponse(recipePage);
         return new RecipePageResponse(recipes, recipePage.getNumber(), recipePage.getTotalPages(), (int) recipePage.getTotalElements());
     }
@@ -288,7 +289,7 @@ public class RecipeService implements RecipeServiceInterface {
         } else if (sort == 4) {
             return Sort.by("rating").descending();
         } else {
-            return Sort.by("createdDate").ascending();
+            return Sort.by("createdDate").descending();
         }
     }
 
@@ -346,7 +347,7 @@ public class RecipeService implements RecipeServiceInterface {
 
     @Override
     public RecipePageResponse getUserRecipes(String username, int page, int size) {
-        Pageable pageRequest = PageRequest.of(page, size);
+        Pageable pageRequest = PageRequest.of(page, size, Sort.by("createdDate").descending());
         ApplicationUser user = userService.getUserByName(username);
         Page<Recipe> recipePage = recipeRepositoryInterface.findAllByUser(user, pageRequest);
         List<RecipeListResponse> recipes = getRecipeResponse(recipePage);

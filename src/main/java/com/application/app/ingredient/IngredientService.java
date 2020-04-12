@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -80,7 +81,7 @@ public class IngredientService implements IngredientServiceInterface {
 
     @Override
     public IngredientPageResponse getIngredientsPage(int page) {
-        Pageable pageRequest = PageRequest.of(page, 25);
+        Pageable pageRequest = PageRequest.of(page, 25, Sort.by("name").ascending());
         Page<Ingredient> ingredientPage = ingredientRepositoryInterface.findAll(pageRequest);
 
         return new IngredientPageResponse(ingredientPage.getContent(), ingredientPage.getNumber(), ingredientPage.getTotalPages(), (int) ingredientPage.getTotalElements());
